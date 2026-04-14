@@ -46,3 +46,5 @@ Użycie generatora skanerów i parserów: ANTLR4 w celu zautomatyzowania procesu
 | Wartości | LICZBA | [0-9]+ | Liczby całkowite | 
 | | IDENT | [a-zA-Z_][a-zA-Z0-9_]* | Nazwy zmiennych | 
 | | TEKST | "[^"]*" | Napisy w cudzysłowie | 
+| Ignorowane | BIALE_ZNAKI | [ \t\r\n]+ | Spacje, taby, entery
+| | KOMENTARZ	| //.* | Komentarze jednolinijkowe
