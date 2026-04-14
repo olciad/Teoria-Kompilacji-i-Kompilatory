@@ -22,29 +22,29 @@ Użycie generatora skanerów i parserów: ANTLR4 w celu zautomatyzowania procesu
 
 # 4. Opis Tokenów
 
-| Kategoria | Nazwa Tokena | Regex/Literal | Opis |
-|-----------|--------------|-----------------------------------|------|
-| Słowa kluczowe | NAPRZOD | naprzod / nprz | Ruch do przodu | 
-| | OBROC | obroc / obr | Obrót o kąt | 
-| | POWTORZ | powtorz | Pętla o stałej liczbie iteracji | 
-| | JEZELI | jezeli | Instrukcja warunkowa | 
-| | INACZEJ | inaczej | Alternatywa warunkowa |
-| | WYPISZ | wypisz | Wyświetlanie tekstu/wyniku | 
-| | USTAW | ustaw | Utowrzenie zmiennej | 
-| Operatory | PLUS / MINUS | + / - | Operacje arytmetyczne | 
-| | RAZY / PRZEZ | * / / | Mnożenie i dzielenie | 
-| | PRZYPIS | = | Operator przypisania | 
-| | ROWNY | == | Operator porównania | 
-| | MNIEJSZY | < | Relacja mniejszości | 
-| | WIEKSZY | > | Relacja większości | 
-| | ORAZ | oraz | Koniunkcja logiczna |
-| | LUB | lub | Alternatywa logiczna |
-| Separatory | L_NAWIAS | ( | Początek wyrażenia/argumentów | 
-| | P_NAWIAS | ) | Koniec wyrażenia/argumentów | 
-| | L_KLAMRA | { | Początek bloku kodu | 
-| | P_KLAMRA | } | Koniec bloku kodu | 
-| Wartości | LICZBA | [0-9]+ | Liczby całkowite | 
-| | IDENT | [a-zA-Z_][a-zA-Z0-9_]* | Nazwy zmiennych | 
-| | TEKST | "[^"]*" | Napisy w cudzysłowie | 
-| Ignorowane | BIALE_ZNAKI | [ \t\r\n]+ | Spacje, taby, entery
-| | KOMENTARZ	| //.* | Komentarze jednolinijkowe
+| Kategoria      | Nazwa Tokena | Regex/Literal            | Opis                            |
+|----------------|--------------|--------------------------|---------------------------------|
+| Słowa kluczowe | NAPRZOD      | `naprzod`                | Ruch do przodu                  | 
+|                | OBROC        | `obroc`                  | Obrót o kąt                     | 
+|                | POWTORZ      | `powtorz`                | Pętla o stałej liczbie iteracji | 
+|                | JEZELI       | `jezeli`                 | Instrukcja warunkowa            | 
+|                | INACZEJ      | `inaczej`                | Alternatywa warunkowa           |
+|                | WYPISZ       | `wypisz`                 | Wyświetlanie tekstu/wyniku      | 
+|                | USTAW        | `ustaw`                  | Utowrzenie zmiennej             | 
+| Operatory      | PLUS / MINUS | `+` / `-`                | Operacje arytmetyczne           | 
+|                | RAZY / PRZEZ | `*` / `/`                | Mnożenie i dzielenie            | 
+|                | PRZYPIS      | `=`                      | Operator przypisania            | 
+|                | ROWNY        | `==`                     | Operator porównania             | 
+|                | MNIEJSZY     | `<`                      | Relacja mniejszości             | 
+|                | WIEKSZY      | `>`                      | Relacja większości              | 
+|                | ORAZ         | `oraz`                   | Koniunkcja logiczna             |
+|                | LUB          | `lub`                    | Alternatywa logiczna            |
+| Separatory     | L_NAWIAS     | `(`                      | Początek wyrażenia/argumentów   | 
+|                | P_NAWIAS     | `)`                      | Koniec wyrażenia/argumentów     | 
+|                | L_KLAMRA     | `{`                      | Początek bloku kodu             | 
+|                | P_KLAMRA     | `}`                      | Koniec bloku kodu               | 
+| Wartości       | LICZBA       | `[0-9]+`                 | Liczby całkowite                | 
+|                | IDENT        | `[a-zA-Z_][a-zA-Z0-9_]*` | Nazwy zmiennych                 | 
+|                | TEKST        | `"[^"]*"`                | Napisy w cudzysłowie            | 
+| Ignorowane     | BIALE_ZNAKI  | `[ \t\r\n]+`             | Spacje, taby, entery            |
+|                | KOMENTARZ	   | `//.*`                   | Komentarze jednolinijkowe       |
