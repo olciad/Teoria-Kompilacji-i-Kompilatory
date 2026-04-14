@@ -48,3 +48,43 @@ Użycie generatora skanerów i parserów: ANTLR4 w celu zautomatyzowania procesu
 |                | TEKST        | `"[^"]*"`                | Napisy w cudzysłowie            | 
 | Ignorowane     | BIALE_ZNAKI  | `[ \t\r\n]+`             | Spacje, taby, entery            |
 |                | KOMENTARZ	   | `//.*`                   | Komentarze jednolinijkowe       |
+
+# 5. Gramatyka
+Gramatyka została zapisana w notacji generatora ANTLR4 
+(z pominięciem reguł leksykalnych, które opisano w tabeli powyżej).
+
+```antlr
+program: instrukcja* EOF ;
+
+instrukcja: polecenie_ruchu
+          | polecenie_obrotu
+          | petla
+          | instrukcja_warunkowa
+          | wypisanie
+          | przypisanie
+          ;
+
+polecenie_ruchu: (NAPRZOD | NPRZ) wyrazenie ;
+polecenie_obrotu: (OBROC | OBR) wyrazenie ;
+
+petla: POWTORZ wyrazenie L_KLAMRA instrukcja* P_KLAMRA ;
+
+instrukcja_warunkowa: JEZELI L_NAWIAS warunek P_NAWIAS L_KLAMRA instrukcja* P_KLAMRA (INACZEJ L_KLAMRA instrukcja* P_KLAMRA)? ;
+
+wypisanie: WYPISZ (wyrazenie | TEKST) ;
+
+przypisanie: USTAW IDENT PRZYPIS wyrazenie ;
+
+warunek: wyrazenie operator_rel wyrazenie
+       | warunek (ORAZ | LUB) warunek
+       ;
+
+operator_rel: ROWNY | MNIEJSZY | WIEKSZY ;
+
+wyrazenie: wyrazenie (RAZY | PRZEZ) wyrazenie
+         | wyrazenie (PLUS | MINUS) wyrazenie
+         | LICZBA
+         | IDENT
+         | L_NAWIAS wyrazenie P_NAWIAS
+         ;
+```
