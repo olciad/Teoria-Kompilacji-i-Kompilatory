@@ -19,3 +19,25 @@ Python
 
 ## Sposób realizacji skanera/parsera: 
 Użycie generatora skanerów i parserów: PLY (Python Lex-Yacc) / ANTLR4 w celu zautomatyzowania procesu analizy leksykalnej i syntaktycznej.
+
+# 4. Opis Tokenów
+
+| Kategoria | Nazwa Tokena | Przykładowy tekst (Regex/Literal) | Opis |
+|-----------|--------------|-----------------------------------|------|
+| Słowa kluczowe | NAPRZOD | naprzod / nprz | Ruch do przodu | 
+| OBROC | obroc / obr | Obrót o kąt | 
+| POWTORZ | powtorz | Pętla o stałej liczbie iteracji | 
+| JEZELI | jezeli | Instrukcja warunkowa | 
+| WYPISZ | wypisz | Wyświetlanie tekstu/wyniku | 
+| USTAW | ustaw | Przypisanie wartości do zmiennej | 
+| Operatory | PLUS / MINUS | + / - | Operacje arytmetyczne | 
+| RAZY / PRZEZ | * / / | Mnożenie i dzielenie | 
+| ROWNY | = | Operator przypisania/porównania | 
+| MNIEJSZY | < | Relacja mniejszości | 
+| Separatory | L_NAWIAS | ( | Początek wyrażenia/argumentów | 
+| P_NAWIAS | ) | Koniec wyrażenia/argumentów | 
+| L_KLAMRA | { | Początek bloku kodu | 
+| P_KLAMRA | } | Koniec bloku kodu | 
+| Wartości | LICZBA | [0-9]+ | Liczby całkowite | 
+| IDENT | [a-zA-Z_][a-zA-Z0-9_]* | Nazwy zmiennych | 
+| TEKST | """[^""]*""" | Napisy w cudzysłowie | 
