@@ -2,87 +2,167 @@
 grammar SigmaScript;
 
 // ==========================================
-// PUNKT 5: GRAMATYKA (PARSER)
+// PARSER (GRAMATYKA)
 // ==========================================
 
-// glowna regula programu - program to instrukcje i znak konca pliku
-program: instrukcja* EOF ;
+// Glowna regula programu - program sklada sie z definicji (instrukcji, struktur, funkcji)
+program: definicja* EOF ;
 
-// czym jest instrukcja
+definicja: instrukcja
+         | definicja_struktury
+         | definicja_funkcji
+         ;
+
+// --- STRUKTURY I FUNKCJE ---
+definicja_struktury: STRUKTURA IDENT L_KLAMRA deklaracja_zmiennej* P_KLAMRA ;
+
+definicja_funkcji: FUNKCJA typ_zwracany IDENT L_NAWIAS parametry? P_NAWIAS blok_kodu ;
+
+parametry: parametr (PRZECINEK parametr)* ;
+parametr: typ IDENT ;
+
+typ_zwracany: typ | PUSTA ;
+typ: (CALKOWITA | RZECZYWISTA | LOGICZNA | TEKST_TYP | IDENT) wymiar_tablicy? ;
+wymiar_tablicy: L_KWADRAT LICZ_CALK? P_KWADRAT ;
+
+blok_kodu: L_KLAMRA instrukcja* P_KLAMRA ;
+
+// --- INSTRUKCJE ---
 instrukcja: polecenie_ruchu
           | polecenie_obrotu
           | petla
+          | petla_warunkowa
           | instrukcja_warunkowa
           | wypisanie
+          | deklaracja_zmiennej
           | przypisanie
+          | instrukcja_zwrotu
+          | wywolanie_funkcji
           ;
 
-// konkretne instrukcje
-polecenie_ruchu: NAPRZOD wyrazenie ;
-polecenie_obrotu: OBROC wyrazenie ;
+// Wbudowane polecenia dla robota/zółwia
+polecenie_ruchu: NAPRZOD wyrazenie_arytmetyczne ;
+polecenie_obrotu: OBROC wyrazenie_arytmetyczne ;
 
-petla: POWTORZ wyrazenie L_KLAMRA instrukcja* P_KLAMRA ;
+// Petle
+petla: POWTORZ wyrazenie_arytmetyczne blok_kodu ;
+petla_warunkowa: DOPOKI L_NAWIAS wyrazenie_logiczne P_NAWIAS blok_kodu ;
 
-instrukcja_warunkowa: JEZELI L_NAWIAS warunek P_NAWIAS L_KLAMRA instrukcja* P_KLAMRA (INACZEJ L_KLAMRA instrukcja* P_KLAMRA)? ;
+// Instrukcje warunkowe (wymaga wyrazenia logicznego)
+instrukcja_warunkowa: JEZELI L_NAWIAS wyrazenie_logiczne P_NAWIAS blok_kodu (INACZEJ blok_kodu)? ;
 
-wypisanie: WYPISZ (wyrazenie | TEKST) ;
+// Inne
+wypisanie: WYPISZ wyrazenie_ogolne ;
+deklaracja_zmiennej: typ IDENT (PRZYPIS wyrazenie_ogolne)? ;
+przypisanie: USTAW odwolanie PRZYPIS wyrazenie_ogolne ;
+instrukcja_zwrotu: ZWROC wyrazenie_ogolne? ;
 
-przypisanie: USTAW IDENT PRZYPIS wyrazenie ;
+// --- ODWOLANIA I FUNKCJE ---
+// Pozwala np. na: tablica[0].wspolrzedna_x
+odwolanie: IDENT (L_KWADRAT wyrazenie_arytmetyczne P_KWADRAT | KROPKA IDENT)* ;
 
-// obsluga warunkow logicznych
-warunek: wyrazenie operator_rel wyrazenie
-       | warunek (ORAZ | LUB) warunek
-       ;
+wywolanie_funkcji: IDENT L_NAWIAS argumenty? P_NAWIAS ;
+argumenty: wyrazenie_ogolne (PRZECINEK wyrazenie_ogolne)* ;
 
-operator_rel: ROWNY | MNIEJSZY | WIEKSZY ;
+inicjalizacja_tablicy: L_KWADRAT argumenty? P_KWADRAT ;
 
-// wyrazenia matematyczne (ANTLR radzi sobie z kolejnoscia dzialan)
-wyrazenie: wyrazenie (RAZY | PRZEZ) wyrazenie
-         | wyrazenie (PLUS | MINUS) wyrazenie
-         | LICZBA
-         | IDENT
-         | L_NAWIAS wyrazenie P_NAWIAS
-         ;
+// --- WYRAZENIA ---
+wyrazenie_ogolne: wyrazenie_arytmetyczne
+                | wyrazenie_logiczne
+                | TEKST
+                | inicjalizacja_tablicy
+                ;
 
+// Wyrazenia logiczne (z zachowaniem priorytetow od gory do dolu)
+wyrazenie_logiczne: L_NAWIAS wyrazenie_logiczne P_NAWIAS
+                  | PRAWDA
+                  | FALSZ
+                  | wywolanie_funkcji
+                  | odwolanie
+                  | wyrazenie_arytmetyczne operator_rel wyrazenie_arytmetyczne
+                  | wyrazenie_logiczne (ROWNY | ROZNY) wyrazenie_logiczne
+                  | NIE wyrazenie_logiczne
+                  | wyrazenie_logiczne ORAZ wyrazenie_logiczne
+                  | wyrazenie_logiczne LUB wyrazenie_logiczne
+                  ;
+operator_rel: ROWNY | ROZNY | MNIEJSZY | WIEKSZY | MNIEJ_ROWN | WIEC_ROWN ;
+
+// Wyrazenia arytmetyczne (z zachowaniem priorytetow matematycznych)
+wyrazenie_arytmetyczne: L_NAWIAS wyrazenie_arytmetyczne P_NAWIAS
+                      | wywolanie_funkcji
+                      | odwolanie
+                      | LICZ_CALK
+                      | LICZ_RZECZ
+                      | wyrazenie_arytmetyczne (RAZY | PRZEZ) wyrazenie_arytmetyczne
+                      | wyrazenie_arytmetyczne (PLUS | MINUS) wyrazenie_arytmetyczne
+                      ;
 
 // ==========================================
-// PUNKT 4: TOKENY (LEXER)
+// LEXER (TOKENY)
 // ==========================================
 
-// slowa kluczowe
+// --- Typy danych ---
+CALKOWITA: 'calkowita';
+RZECZYWISTA: 'rzeczywista';
+LOGICZNA: 'logiczna';
+TEKST_TYP: 'tekst';
+PUSTA: 'pusta';
+
+// --- Slowa kluczowe narzedziowe ---
+STRUKTURA: 'struktura';
+FUNKCJA: 'funkcja';
+ZWROC: 'zwroc';
+
+// --- Wartosci logiczne ---
+PRAWDA: 'prawda';
+FALSZ: 'falsz';
+
+// --- Instrukcje bazowe ---
 NAPRZOD: 'naprzod';
 OBROC: 'obroc';
 POWTORZ: 'powtorz';
+DOPOKI: 'dopoki';
 JEZELI: 'jezeli';
 INACZEJ: 'inaczej';
 WYPISZ: 'wypisz';
 USTAW: 'ustaw';
 
-// operatory logiczne
+// --- Operatory logiczne ---
 ORAZ: 'oraz';
 LUB: 'lub';
+NIE: 'nie';
 
-// operatory
+// --- Operatory matematyczne i przypisania ---
 PLUS: '+';
 MINUS: '-';
 RAZY: '*';
 PRZEZ: '/';
 PRZYPIS: '=';
+
+// --- Operatory relacyjne ---
 ROWNY: '==';
+ROZNY: '!=';
+MNIEJ_ROWN: '<=';
+WIEC_ROWN: '>=';
 MNIEJSZY: '<';
 WIEKSZY: '>';
 
-// separatory
+// --- Separatory ---
 L_NAWIAS: '(';
 P_NAWIAS: ')';
 L_KLAMRA: '{';
 P_KLAMRA: '}';
+L_KWADRAT: '[';
+P_KWADRAT: ']';
+KROPKA: '.';
+PRZECINEK: ',';
 
-// wartosci (wyrazenia regularne)
-LICZBA: [0-9]+ ;
+// --- Wyrazenia regularne dla zmiennych i stalych ---
+LICZ_CALK: [0-9]+ ;
+LICZ_RZECZ: [0-9]+ '.' [0-9]+ ;
 IDENT: [a-zA-Z_][a-zA-Z0-9_]* ;
-TEKST: '"' ~'"'* '"' ; //akceptuje wszystko wewnatrz cudzyslowow
+TEKST: '"' ~'"'* '"' ; // Akceptuje wszystko wewnatrz cudzyslowow
 
-// ignorowanie bialych znakow i komentarzy
+// --- Ignorowanie znakow i komentarze ---
 WS: [ \t\r\n]+ -> skip ;
 COMMENT: '//' ~[\r\n]* -> skip ;
