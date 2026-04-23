@@ -95,6 +95,7 @@ wyrazenie_arytmetyczne: L_NAWIAS wyrazenie_arytmetyczne P_NAWIAS
                       | LICZ_RZECZ
                       | wyrazenie_arytmetyczne (RAZY | PRZEZ) wyrazenie_arytmetyczne
                       | wyrazenie_arytmetyczne (PLUS | MINUS) wyrazenie_arytmetyczne
+                      | MINUS wyrazenie_arytmetyczne
                       ;
 
 // ==========================================
