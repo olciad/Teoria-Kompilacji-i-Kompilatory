@@ -88,3 +88,11 @@ wyrazenie: wyrazenie (RAZY | PRZEZ) wyrazenie
          | L_NAWIAS wyrazenie P_NAWIAS
          ;
 ```
+# 6. Przykładowy program napisany w języku
+
+``` ustaw kroki = 10
+powtorz 4 {
+    naprzod kroki
+    obroc 90
+}
+wypisz "Kwadrat narysowany!"
