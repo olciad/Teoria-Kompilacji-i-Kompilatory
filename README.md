@@ -88,11 +88,23 @@ wyrazenie: wyrazenie (RAZY | PRZEZ) wyrazenie
          | L_NAWIAS wyrazenie P_NAWIAS
          ;
 ```
-# 6. Przykładowy program napisany w języku
+# 6. Wymagania wstępne
+
+- Python 3.8+
+- ANTLR4 Python3 Runtime: Biblioteka niezbędna do zrozumienia składni języka.
+
+Instalacja: ```pip install antlr4-python3-runtime```
+
+- Kompilator C (np. GCC lub Clang)
+- Biblioteka Standardowa C
+
+# 7. 
+
+# 8. Przykładowy program napisany w języku
 
 ``` ustaw kroki = 10
 powtorz 4 {
     naprzod kroki
     obroc 90
 }
-wypisz "Kwadrat narysowany!"
+wypisz "Kwadrat narysowany!"```
