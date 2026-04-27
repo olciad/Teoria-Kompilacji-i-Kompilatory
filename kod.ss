@@ -27,7 +27,7 @@ funkcja rzeczywista oblicz_koszt(calkowita dystans) {
 
 // 3. GŁÓWNY PROGRAM
 // Deklaracja zmiennych z użyciem różnych typów i inicjalizacji.
-wypisz "--- ROZPOCZECIE MISJI DRONA ---"
+wypisz "ROZPOCZECIE MISJI DRONA"
 
 Dron moj_dron
 ustaw moj_dron.pozycja_x = 0
@@ -77,7 +77,7 @@ dopoki (indeks < 4 oraz moj_dron.bateria > 0.0) {
     ustaw indeks = indeks + 1
 }
 
-wypisz "--- KONIEC MISJI ---"
+wypisz "KONIEC MISJI"
 jezeli (moj_dron.w_powietrzu == falsz) {
     wypisz "Dron awaryjnie wyladowal."
 }
