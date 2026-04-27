@@ -1,45 +1,8 @@
-# import sys
-# from antlr4 import *
-# from SigmaScriptLexer import SigmaScriptLexer
-# from SigmaScriptParser import SigmaScriptParser
-#
-#
-# def main():
-#     # 1. Sprawdzamy, czy plik kod.edu istnieje i wczytujemy go
-#     try:
-#         input_stream = FileStream('kod.ss', encoding='utf-8')
-#     except Exception as e:
-#         print(f"Błąd wczytywania pliku: {e}")
-#         return
-#
-#     # 2. ETAP SKANERA (Punkt 4 projektu)
-#     # Lexer czyta tekst znak po znaku i zamienia na tokeny
-#     lexer = SigmaScriptLexer(input_stream)
-#     stream = CommonTokenStream(lexer)
-#
-#     # 3. ETAP PARSERA (Punkt 5 projektu)
-#     # Parser bierze tokeny i układa je w drzewo składniowe (sprawdza gramatykę)
-#     parser = SigmaScriptParser(stream)
-#
-#     # Wywołujemy główną regułę naszej gramatyki (nazwaliśmy ją 'program' w pliku .g4)
-#     tree = parser.program()
-#
-#     # 4. PREZENTACJA PROTOTYPU
-#     # Na tym etapie, jeśli kod nie zawierał błędów składniowych, parser zbudował drzewo.
-#     # Wypiszemy je w konsoli w formacie tekstowym (tzw. LISP-style tree).
-#     print("Sukces! Kod został przetworzony.")
-#     print("Drzewo składniowe:")
-#     print(tree.toStringTree(recog=parser))
-#
-#
-# if __name__ == '__main__':
-#     main()
-
 import sys
 from antlr4 import *
-from SigmaScriptLexer import SigmaScriptLexer
-from SigmaScriptParser import SigmaScriptParser
-from SigmaScriptVisitor import SigmaScriptVisitor
+from antlr_generated.SigmaScriptLexer import SigmaScriptLexer
+from antlr_generated.SigmaScriptParser import SigmaScriptParser
+from antlr_generated.SigmaScriptVisitor import SigmaScriptVisitor
 
 
 # Nasza własna klasa kompilatora, nadpisująca domyślnego Visitora
