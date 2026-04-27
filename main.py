@@ -4,94 +4,109 @@ from antlr_generated.SigmaScriptLexer import SigmaScriptLexer
 from antlr_generated.SigmaScriptParser import SigmaScriptParser
 from antlr_generated.SigmaScriptVisitor import SigmaScriptVisitor
 
+# biblioteka runtime
+RUNTIME_C = """#include <stdio.h>
+#include <math.h>
 
-# Nasza własna klasa kompilatora, nadpisująca domyślnego Visitora
+FILE *svg_file;
+float _x = 500.0; // Startujemy na środku płótna 1000x1000
+float _y = 500.0;
+float _kat = -90.0; // -90 stopni oznacza, że na początku patrzymy "w górę" ekranu
+
+void _init_svg() {
+    svg_file = fopen("wynik.svg", "w");
+    fprintf(svg_file, "<svg width=\\"1000\\" height=\\"1000\\" xmlns=\\"http://www.w3.org/2000/svg\\">\\n");
+    fprintf(svg_file, "<rect width=\\"100%%\\" height=\\"100%%\\" fill=\\"#f0f0f0\\"/>\\n"); // Jasnoszare tło
+}
+
+void _zapisz_svg() {
+    fprintf(svg_file, "</svg>\\n");
+    fclose(svg_file);
+    printf("[Zolw] Misja zakonczona. Wygenerowano plik wynik.svg!\\n");
+}
+
+void _naprzod(float dystans) {
+    float rad = _kat * (3.14159265 / 180.0);
+    float new_x = _x + dystans * cos(rad);
+    float new_y = _y + dystans * sin(rad);
+
+    // Rysujemy linię w SVG
+    fprintf(svg_file, "<line x1=\\"%.2f\\" y1=\\"%.2f\\" x2=\\"%.2f\\" y2=\\"%.2f\\" stroke=\\"#2c3e50\\" stroke-width=\\"3\\" stroke-linecap=\\"round\\" />\\n", _x, _y, new_x, new_y);
+
+    // Aktualizujemy pozycję
+    _x = new_x;
+    _y = new_y;
+}
+
+void _obroc(float zmiana_kata) {
+    _kat += zmiana_kata;
+}
+"""
+
+
 class KompilatorVisitor(SigmaScriptVisitor):
-
     def __init__(self):
-        # Tutaj będziemy zbierać wygenerowany kod w C
         self.kod_c = []
 
-    # Odwiedzanie węzła reguły 'program'
+    # 1. Wejście do programu
     def visitProgram(self, ctx: SigmaScriptParser.ProgramContext):
         print("[Kompilator] Rozpoczynam analizę programu...")
-        self.kod_c.append("#include <stdio.h>\n")
-        self.kod_c.append("int main() {")
 
-        # Odwiedź wszystkie dzieci (instrukcje w programie)
+        # Wklejamy nasz runtime na górę pliku C
+        self.kod_c.append(RUNTIME_C)
+        self.kod_c.append("\nint main() {")
+        self.kod_c.append("    _init_svg(); // Ukryta inicjalizacja płótna\n")
+
+        # Odwiedzamy instrukcje napisane przez użytkownika
         self.visitChildren(ctx)
 
+        # Zamykamy plik SVG i program C
+        self.kod_c.append("\n    _zapisz_svg(); // Ukryte zapisanie pliku")
         self.kod_c.append("    return 0;\n}")
         return "".join(self.kod_c)
 
-    # Odwiedzanie węzła reguły 'wypisanie'
+    # 2. Obsługa polecenia NAPRZOD
+    def visitPolecenie_ruchu(self, ctx: SigmaScriptParser.Polecenie_ruchuContext):
+        # Pobieramy to co jest po słowie "naprzod".
+        # Dzięki ".getText()" tekst taki jak "50" lub "10+5" zostanie po prostu skopiowany do C
+        dystans = ctx.wyrazenie_arytmetyczne().getText()
+        print(f"[Kompilator] Znalazłem ruch: naprzod {dystans}")
+        self.kod_c.append(f'    _naprzod({dystans});')
+        return None
+
+    # 3. Obsługa polecenia OBROC
+    def visitPolecenie_obrotu(self, ctx: SigmaScriptParser.Polecenie_obrotuContext):
+        kat = ctx.wyrazenie_arytmetyczne().getText()
+        print(f"[Kompilator] Znalazłem obrót: obroc {kat}")
+        self.kod_c.append(f'    _obroc({kat});')
+        return None
+
+    # (Zostawiamy na razie puste metody na zmienne, żeby uniknąć błędów)
     def visitWypisanie(self, ctx: SigmaScriptParser.WypisanieContext):
-        # Pobieramy to, co zostało wpisane po słowie 'wypisz'
         wyrazenie = ctx.wyrazenie_ogolne().getText()
-        print(f"[Kompilator] Znalazłem instrukcję WYPISZ: {wyrazenie}")
-
-        # Generujemy odpowiednik w C (dla uproszczenia traktujemy jako string/liczbę bezpośrednio)
-        # UWAGA: W pełnej wersji będziesz musiał sprawdzić typ, żeby dobrać %d, %f lub %s!
         self.kod_c.append(f'    printf("%s\\n", {wyrazenie});')
-
-        return self.visitChildren(ctx)
-
-    # Odwiedzanie węzła reguły 'deklaracja_zmiennej'
-    def visitDeklaracja_zmiennej(self, ctx: SigmaScriptParser.Deklaracja_zmiennejContext):
-        typ = ctx.typ().getText()
-        nazwa = ctx.IDENT().getText()
-
-        # Pobranie przypisywanej wartości (jeśli istnieje)
-        wartosc = ""
-        if ctx.wyrazenie_ogolne():
-            wartosc = " = " + ctx.wyrazenie_ogolne().getText()
-
-        print(f"[Kompilator] Deklaracja zmiennej: {typ} {nazwa}{wartosc}")
-
-        # Prymitywne tłumaczenie typów na C
-        typ_c = "int"
-        if typ == "rzeczywista":
-            typ_c = "float"
-        elif typ == "logiczna":
-            typ_c = "int"  # W C bool to często po prostu int
-        elif typ == "tekst":
-            typ_c = "char*"
-
-        self.kod_c.append(f'    {typ_c} {nazwa}{wartosc};')
-
-        return self.visitChildren(ctx)
+        return None
 
 
 def main():
-    # Sprawdzanie, czy podano plik źródłowy
     if len(sys.argv) < 2:
-        print("Użycie: python main.py <plik.sigma>")
+        print("Użycie: python main.py <plik.ss>")
         return
 
     plik_wejsciowy = sys.argv[1]
-
-    # 1. Wczytanie pliku źródłowego
     input_stream = FileStream(plik_wejsciowy, encoding='utf-8')
-
-    # 2. Analiza leksykalna (Lexer)
     lexer = SigmaScriptLexer(input_stream)
     stream = CommonTokenStream(lexer)
-
-    # 3. Analiza składniowa (Parser)
     parser = SigmaScriptParser(stream)
-    tree = parser.program()  # Rozpoczynamy od reguły 'program'
+    tree = parser.program()
 
-    # 4. Przejście po drzewie AST (Visitor)
     visitor = KompilatorVisitor()
     gotowy_kod_c = visitor.visit(tree)
 
-    # 5. Zapisanie wygenerowanego kodu C do pliku
     with open("wynik.c", "w", encoding='utf-8') as f:
         f.write(gotowy_kod_c)
 
-    print("\n[Sukces] Wygenerowano plik wynik.c!")
-    print("--- ZAWARTOSC PLIKU C ---")
-    print(gotowy_kod_c)
+    print("\n[Sukces] Wygenerowano kod docelowy w wynik.c")
 
 
 if __name__ == '__main__':
