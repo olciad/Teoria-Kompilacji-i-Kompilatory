@@ -81,6 +81,26 @@ class KompilatorVisitor(SigmaScriptVisitor):
         self.kod_c.append(f'    _obroc({kat});')
         return None
 
+    # 4. Obsługa pętli POWTORZ
+    def visitPetla(self, ctx: SigmaScriptParser.PetlaContext):
+        # Pobieramy liczbę powtórzeń (np. "4")
+        ile_razy = ctx.wyrazenie_arytmetyczne().getText()
+        print(f"[Kompilator] Znalazłem pętlę: powtorz {ile_razy}")
+
+        # Używamy id(ctx), żeby każda pętla miała unikalną nazwę zmiennej (np. _i_12345).
+        # Dzięki temu pętle w SigmaScript będzie można bezpiecznie zagnieżdżać!
+        zmienna_petli = f"_i_{id(ctx)}"
+
+        # Otwieramy pętlę for w C
+        self.kod_c.append(f"    for(int {zmienna_petli} = 0; {zmienna_petli} < (int)({ile_razy}); {zmienna_petli}++) {{")
+
+        # Odwiedzamy TYLKO blok kodu (instrukcje wewnątrz klamer)
+        self.visit(ctx.blok_kodu())
+
+        # Zamykamy klamrę pętli w C
+        self.kod_c.append("    }")
+        return None
+
     # (Zostawiamy na razie puste metody na zmienne, żeby uniknąć błędów)
     def visitWypisanie(self, ctx: SigmaScriptParser.WypisanieContext):
         wyrazenie = ctx.wyrazenie_ogolne().getText()
