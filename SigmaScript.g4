@@ -1,7 +1,4 @@
 // Plik: SigmaScript.g4
-// Komendy do generowania:
-// antlr4 -Dlanguage=Python3 -visitor SigmaScript.g4 -o antlr_generated
-// antlr4-parse SigmaScript.g4 program -gui kod.ss
 grammar SigmaScript;
 
 // ==========================================

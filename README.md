@@ -251,11 +251,10 @@ wyrazenie_arytmetyczne: wyrazenie_arytmetyczne (RAZY | PRZEZ) wyrazenie_arytmety
                       | L_NAWIAS wyrazenie_arytmetyczne P_NAWIAS
                       ;
 ```
-# 7. Wymagania wstępne i instalacja
+# 7. Wymagania wstępne, instalacja i instrukcja obsługi
 
+## Środowisko Python i ANTLR
 Aby poprawnie wygenerować parser, skompilować kod języka oraz uruchomić program docelowy, wymagane jest następujące oprogramowanie:
-
-### Środowisko Python i ANTLR
 - **Python 3.8+**
 - **Java (JRE/JDK):** Wymagana pod spodem przez narzędzie ANTLR do generowania plików parsera.
 - **antlr4-tools:** Oficjalne narzędzie do generowania klas z plików `.g4`.
@@ -266,14 +265,40 @@ Aby poprawnie wygenerować parser, skompilować kod języka oraz uruchomić prog
 pip install antlr4-tools antlr4-python3-runtime
 ```
 
-### Środowisko C
+## Instrukcja obsługi
+
+### Generowanie skanera i parsera
+- wygenerowanie klas Pythona skanera i parsera oraz mechanizmu Visitor:
+```bash
+antlr4 -Dlanguage=Python3 -visitor SigmaScript.g4 -o antlr_generated
+```
+- wyświetlenie drzewa składniowego
+```bash
+antlr4-parse SigmaScript.g4 program -gui kod.ss
+```
+
+### Translacja SigmaScript do języka C
+
+```bash
+python main.py ./programs/kod.ss
+```
+
+### Kompilacja i uruchomienie programu w C
 
 * Kompilator C: np. GCC lub Clang.
 
 * Biblioteka matematyczna: Wygenerowany kod w języku C korzysta z biblioteki <math.h> (funkcje sin, cos) do obliczania wektorów ruchu żółwia/drona.
 
-Ważna uwaga dotycząca kompilacji w C: Podczas kompilowania pliku `wynik.c` na systemach Linux/macOS, należy pamiętać o dodaniu flagi `-lm` w celu zlinkowania biblioteki matematycznej:
+Uwaga dotycząca kompilacji w C: Podczas kompilowania pliku `wynik.c` na systemach Linux/UNIX, należy pamiętać o dodaniu flagi `-lm` w celu zlinkowania biblioteki matematycznej:
 
 ```bash
 gcc wynik.c -o rysownik -lm
 ```
+
+Skompilowany program można uruchomić następującym poleceniem na systemach Linux/UNIX:
+
+```bash
+./rysownik
+```
+
+Po wykonaniu programu powinien się wygenerować plik `wynik.svg` z wygenerowanym rysunkiem.
