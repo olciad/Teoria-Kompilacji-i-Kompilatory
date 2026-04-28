@@ -251,12 +251,29 @@ wyrazenie_arytmetyczne: wyrazenie_arytmetyczne (RAZY | PRZEZ) wyrazenie_arytmety
                       | L_NAWIAS wyrazenie_arytmetyczne P_NAWIAS
                       ;
 ```
-# 7. Wymagania wstępne
+# 7. Wymagania wstępne i instalacja
 
-- Python 3.8+
-- ANTLR4 Python3 Runtime: Biblioteka niezbędna do zrozumienia składni języka.
+Aby poprawnie wygenerować parser, skompilować kod języka oraz uruchomić program docelowy, wymagane jest następujące oprogramowanie:
 
-Instalacja: ```pip install antlr4-python3-runtime```
+### Środowisko Python i ANTLR
+- **Python 3.8+**
+- **Java (JRE/JDK):** Wymagana pod spodem przez narzędzie ANTLR do generowania plików parsera.
+- **antlr4-tools:** Oficjalne narzędzie do generowania klas z plików `.g4`.
+- **antlr4-python3-runtime:** Biblioteka w Pythonie niezbędna do analizy drzewa składniowego (AST) i działania naszego Visitora.
 
-- Kompilator C (np. GCC lub Clang)
-- Biblioteka Standardowa C
+**Instalacja pakietów Python:**
+```bash
+pip install antlr4-tools antlr4-python3-runtime
+```
+
+### Środowisko C
+
+* Kompilator C: np. GCC lub Clang.
+
+* Biblioteka matematyczna: Wygenerowany kod w języku C korzysta z biblioteki <math.h> (funkcje sin, cos) do obliczania wektorów ruchu żółwia/drona.
+
+Ważna uwaga dotycząca kompilacji w C: Podczas kompilowania pliku `wynik.c` na systemach Linux/macOS, należy pamiętać o dodaniu flagi `-lm` w celu zlinkowania biblioteki matematycznej:
+
+```bash
+gcc wynik.c -o rysownik -lm
+```
