@@ -46,127 +46,188 @@ void _obroc(float zmiana_kata) {
 
 class KompilatorVisitor(SigmaScriptVisitor):
     def __init__(self):
-        self.kod_c = []
+        self.kod_globalny = []
+        self.kod_main = []
+        self.w_funkcji = False
 
-    # 1. Wejście do programu
+    def dodaj_kod(self, linia):
+        if self.w_funkcji:
+            self.kod_globalny.append(linia)
+        else:
+            self.kod_main.append(linia)
+
     def visitProgram(self, ctx: SigmaScriptParser.ProgramContext):
         print("[Kompilator] Rozpoczynam analizę programu...")
-
-        # Wklejamy nasz runtime na górę pliku C
-        self.kod_c.append(RUNTIME_C)
-        self.kod_c.append("\nint main() {")
-        self.kod_c.append("    _init_svg(); // Ukryta inicjalizacja płótna\n")
-
-        # Odwiedzamy instrukcje napisane przez użytkownika
         self.visitChildren(ctx)
 
-        # Zamykamy plik SVG i program C
-        self.kod_c.append("\n    _zapisz_svg(); // Ukryte zapisanie pliku")
-        self.kod_c.append("    return 0;\n}")
-        return "".join(self.kod_c)
+        ostateczny_kod = [RUNTIME_C]
+        ostateczny_kod.extend(self.kod_globalny)
+        ostateczny_kod.append("\nint main() {")
+        ostateczny_kod.append("    _init_svg();")
+        ostateczny_kod.extend(self.kod_main)
+        ostateczny_kod.append("    _zapisz_svg();\n    return 0;\n}")
+        return "\n".join(ostateczny_kod)
 
-    # 2. Obsługa polecenia NAPRZOD
-    def visitPolecenie_ruchu(self, ctx: SigmaScriptParser.Polecenie_ruchuContext):
-        # Pobieramy to co jest po słowie "naprzod".
-        # Dzięki ".getText()" tekst taki jak "50" lub "10+5" zostanie po prostu skopiowany do C
-        dystans = ctx.wyrazenie_arytmetyczne().getText()
-        print(f"[Kompilator] Znalazłem ruch: naprzod {dystans}")
-        self.kod_c.append(f'    _naprzod({dystans});')
+    # STRUKTURY
+    def visitDefinicja_struktury(self, ctx: SigmaScriptParser.Definicja_strukturyContext):
+        nazwa_struktury = ctx.IDENT().getText()
+        print(f"[Kompilator] Definicja struktury: {nazwa_struktury}")
+
+        self.w_funkcji = True  # Struktury muszą trafić na samą górę pliku C
+        self.dodaj_kod(f"\ntypedef struct {{")
+
+        # Czytamy pola struktury
+        for deklaracja in ctx.deklaracja_zmiennej():
+            typ_bazowy = deklaracja.typ().getChild(0).getText()
+            nazwa_pola = deklaracja.IDENT().getText()
+            wymiar = deklaracja.typ().wymiar_tablicy().getText() if deklaracja.typ().wymiar_tablicy() else ""
+
+            if "calkowita" in typ_bazowy:
+                typ_c = "int"
+            elif "rzeczywista" in typ_bazowy:
+                typ_c = "float"
+            elif "logiczna" in typ_bazowy:
+                typ_c = "int"
+            else:
+                typ_c = typ_bazowy  # Pozwala nawet na struktury w strukturach!
+
+            self.dodaj_kod(f"    {typ_c} {nazwa_pola}{wymiar};")
+
+        self.dodaj_kod(f"}} {nazwa_struktury};")
+        self.w_funkcji = False
         return None
 
-    # 3. Obsługa polecenia OBROC
-    def visitPolecenie_obrotu(self, ctx: SigmaScriptParser.Polecenie_obrotuContext):
-        kat = ctx.wyrazenie_arytmetyczne().getText()
-        print(f"[Kompilator] Znalazłem obrót: obroc {kat}")
-        self.kod_c.append(f'    _obroc({kat});')
-        return None
+    # FUNKCJE
+    def visitDefinicja_funkcji(self, ctx: SigmaScriptParser.Definicja_funkcjiContext):
+        typ_zwracany = ctx.typ_zwracany().getText()
+        if "calkowita" in typ_zwracany:
+            typ_c = "int"
+        elif "rzeczywista" in typ_zwracany:
+            typ_c = "float"
+        elif "logiczna" in typ_zwracany:
+            typ_c = "int"
+        elif "pusta" in typ_zwracany:
+            typ_c = "void"
+        else:
+            typ_c = typ_zwracany  # Zwracanie obiektów struktur
 
-    # 4. Obsługa pętli POWTORZ
-    def visitPetla(self, ctx: SigmaScriptParser.PetlaContext):
-        # Pobieramy liczbę powtórzeń (np. "4")
-        ile_razy = ctx.wyrazenie_arytmetyczne().getText()
-        print(f"[Kompilator] Znalazłem pętlę: powtorz {ile_razy}")
+        nazwa_funkcji = ctx.IDENT().getText()
+        print(f"[Kompilator] Deklaracja funkcji: {nazwa_funkcji}")
 
-        # Używamy id(ctx), żeby każda pętla miała unikalną nazwę zmiennej (np. _i_12345).
-        # Dzięki temu pętle w SigmaScript będzie można bezpiecznie zagnieżdżać!
-        zmienna_petli = f"_i_{id(ctx)}"
+        parametry_c = []
+        if ctx.parametry():
+            for param in ctx.parametry().parametr():
+                typ_param_sigma = param.typ().getChild(0).getText()
+                if "calkowita" in typ_param_sigma:
+                    p_typ = "int"
+                elif "rzeczywista" in typ_param_sigma:
+                    p_typ = "float"
+                elif "logiczna" in typ_param_sigma:
+                    p_typ = "int"
+                else:
+                    p_typ = typ_param_sigma  # Parametr typu struktury
 
-        # Otwieramy pętlę for w C
-        self.kod_c.append(f"    for(int {zmienna_petli} = 0; {zmienna_petli} < (int)({ile_razy}); {zmienna_petli}++) {{")
+                parametry_c.append(f"{p_typ} {param.IDENT().getText()}")
 
-        # Odwiedzamy TYLKO blok kodu (instrukcje wewnątrz klamer)
+        self.w_funkcji = True
+        self.dodaj_kod(f"\n{typ_c} {nazwa_funkcji}({', '.join(parametry_c)}) {{")
         self.visit(ctx.blok_kodu())
-
-        # Zamykamy klamrę pętli w C
-        self.kod_c.append("    }")
+        self.dodaj_kod("}")
+        self.w_funkcji = False
         return None
 
-    # 5. Obsługa deklaracji zmiennej (np. calkowita x = 10)
+    def visitInstrukcja_zwrotu(self, ctx: SigmaScriptParser.Instrukcja_zwrotuContext):
+        if ctx.wyrazenie_ogolne():
+            wartosc = ctx.wyrazenie_ogolne().getText().replace("prawda", "1").replace("falsz", "0")
+            self.dodaj_kod(f"    return {wartosc};")
+        else:
+            self.dodaj_kod("    return;")
+        return None
+
+    def visitWywolanie_funkcji(self, ctx: SigmaScriptParser.Wywolanie_funkcjiContext):
+        kod = ctx.getText().replace("prawda", "1").replace("falsz", "0")
+        print(f"[Kompilator] Wywołanie funkcji: {kod}")
+        self.dodaj_kod(f"    {kod};")
+        return None
+
+    # ZMIENNE I TABLICE
     def visitDeklaracja_zmiennej(self, ctx: SigmaScriptParser.Deklaracja_zmiennejContext):
-        typ_sigma = ctx.typ().getText()
+        typ_bazowy = ctx.typ().getChild(0).getText()
+        wymiar = ctx.typ().wymiar_tablicy().getText() if ctx.typ().wymiar_tablicy() else ""
         nazwa = ctx.IDENT().getText()
 
-        # Tłumaczenie typów z SigmaScript na C
-        if "calkowita" in typ_sigma:
+        if "calkowita" in typ_bazowy:
             typ_c = "int"
-        elif "rzeczywista" in typ_sigma:
+        elif "rzeczywista" in typ_bazowy:
             typ_c = "float"
-        elif "logiczna" in typ_sigma:
+        elif "logiczna" in typ_bazowy:
             typ_c = "int"
-        elif "tekst" in typ_sigma:
-            typ_c = "char*"
         else:
-            typ_c = "int"  # Fallback np. dla własnych struktur
+            typ_c = typ_bazowy  # Obsługa inicjalizacji struktury: Dron moj_dron
 
-        # Jeśli zmienna ma od razu przypisaną wartość
+        wartosc_c = ""
         if ctx.wyrazenie_ogolne():
-            wartosc = ctx.wyrazenie_ogolne().getText()
-            # Tłumaczenie polskich słów logicznych na wartości dla C
-            wartosc = wartosc.replace("prawda", "1").replace("falsz", "0")
-            self.kod_c.append(f"    {typ_c} {nazwa} = {wartosc};")
-        else:
-            self.kod_c.append(f"    {typ_c} {nazwa};")
+            wartosc_sigma = ctx.wyrazenie_ogolne().getText()
+            if wartosc_sigma.startswith("[") and wartosc_sigma.endswith("]"):
+                wartosc_c = " = {" + wartosc_sigma[1:-1] + "}"
+            else:
+                wartosc_c = " = " + wartosc_sigma.replace("prawda", "1").replace("falsz", "0")
 
+        print(f"[Kompilator] Deklaracja zmiennej: {nazwa} ({typ_c})")
+        self.dodaj_kod(f"    {typ_c} {nazwa}{wymiar}{wartosc_c};")
         return None
 
-    # 6. Obsługa przypisania (np. ustaw x = 20)
     def visitPrzypisanie(self, ctx: SigmaScriptParser.PrzypisanieContext):
-        odwolanie = ctx.odwolanie().getText()
-        wartosc = ctx.wyrazenie_ogolne().getText()
-        wartosc = wartosc.replace("prawda", "1").replace("falsz", "0")
-        self.kod_c.append(f"    {odwolanie} = {wartosc};")
+        self.dodaj_kod(
+            f"    {ctx.odwolanie().getText()} = {ctx.wyrazenie_ogolne().getText().replace('prawda', '1').replace('falsz', '0')};")
         return None
 
-    # 7. Obsługa instrukcji warunkowej JEZELI ... INACZEJ
+    # STEROWANIE I LOGIKA
+    def visitPolecenie_ruchu(self, ctx):
+        print(f"[Kompilator] Znalazłem ruch: naprzod {ctx.wyrazenie_arytmetyczne().getText()}")
+        self.dodaj_kod(f"    _naprzod({ctx.wyrazenie_arytmetyczne().getText()});")
+        return None
+
+    def visitPolecenie_obrotu(self, ctx):
+        print(f"[Kompilator] Znalazłem obrót: obroc {ctx.wyrazenie_arytmetyczne().getText()}")
+        self.dodaj_kod(f"    _obroc({ctx.wyrazenie_arytmetyczne().getText()});")
+        return None
+
+    def visitWypisanie(self, ctx):
+        self.dodaj_kod(f"    printf(\"%s\\n\", {ctx.wyrazenie_ogolne().getText()});")
+        return None
+
+    def visitPetla(self, ctx: SigmaScriptParser.PetlaContext):
+        ile = ctx.wyrazenie_arytmetyczne().getText()
+        print(f"[Kompilator] Znalazłem pętlę: powtorz {ile}")
+        z_petli = f"_i_{id(ctx)}"
+        self.dodaj_kod(f"    for(int {z_petli} = 0; {z_petli} < (int)({ile}); {z_petli}++) {{")
+        self.visit(ctx.blok_kodu())
+        self.dodaj_kod("    }")
+        return None
+
+    def visitPetla_warunkowa(self, ctx: SigmaScriptParser.Petla_warunkowaContext):
+        warunek_c = ctx.wyrazenie_logiczne().getText().replace("oraz", "&&").replace("lub", "||").replace("prawda",
+                                                                                                          "1").replace(
+            "falsz", "0").replace("nie", "!")
+        print(f"[Kompilator] Znalazłem pętlę warunkową (dopoki): {warunek_c}")
+        self.dodaj_kod(f"    while ({warunek_c}) {{")
+        self.visit(ctx.blok_kodu())
+        self.dodaj_kod("    }")
+        return None
+
     def visitInstrukcja_warunkowa(self, ctx: SigmaScriptParser.Instrukcja_warunkowaContext):
-        # Pobieramy polski warunek logiczny z kodu
-        warunek_sigma = ctx.wyrazenie_logiczne().getText()
-
-        # Szybkie tłumaczenie polskich operatorów na C
-        warunek_c = warunek_sigma.replace("oraz", "&&") \
-            .replace("lub", "||") \
-            .replace("prawda", "1") \
-            .replace("falsz", "0") \
-            .replace("nie", "!")
-
-        # Otwieramy IF w C
-        self.kod_c.append(f"    if ({warunek_c}) {{")
-
-        # Odwiedzamy pierwszy blok kodu (wykona się, gdy prawda)
+        warunek = ctx.wyrazenie_logiczne().getText().replace("oraz", "&&").replace("lub", "||").replace("prawda",
+                                                                                                        "1").replace(
+            "falsz", "0").replace("nie", "!")
+        print(f"[Kompilator] Znalazłem instrukcję warunkową (jezeli): {warunek}")
+        self.dodaj_kod(f"    if ({warunek}) {{")
         self.visit(ctx.blok_kodu(0))
-        self.kod_c.append("    }")
-
-        # Jeśli uczeń dopisał słowo "inaczej" (else), odwiedzamy drugi blok kodu
+        self.dodaj_kod("    }")
         if ctx.INACZEJ():
-            self.kod_c.append("    else {")
+            self.dodaj_kod("    else {")
             self.visit(ctx.blok_kodu(1))
-            self.kod_c.append("    }")
-
-        return None
-    # (Zostawiamy na razie puste metody na zmienne, żeby uniknąć błędów)
-    def visitWypisanie(self, ctx: SigmaScriptParser.WypisanieContext):
-        wyrazenie = ctx.wyrazenie_ogolne().getText()
-        self.kod_c.append(f'    printf("%s\\n", {wyrazenie});')
+            self.dodaj_kod("    }")
         return None
 
 
