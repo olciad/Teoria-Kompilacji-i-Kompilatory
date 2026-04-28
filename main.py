@@ -101,6 +101,68 @@ class KompilatorVisitor(SigmaScriptVisitor):
         self.kod_c.append("    }")
         return None
 
+    # 5. Obsługa deklaracji zmiennej (np. calkowita x = 10)
+    def visitDeklaracja_zmiennej(self, ctx: SigmaScriptParser.Deklaracja_zmiennejContext):
+        typ_sigma = ctx.typ().getText()
+        nazwa = ctx.IDENT().getText()
+
+        # Tłumaczenie typów z SigmaScript na C
+        if "calkowita" in typ_sigma:
+            typ_c = "int"
+        elif "rzeczywista" in typ_sigma:
+            typ_c = "float"
+        elif "logiczna" in typ_sigma:
+            typ_c = "int"
+        elif "tekst" in typ_sigma:
+            typ_c = "char*"
+        else:
+            typ_c = "int"  # Fallback np. dla własnych struktur
+
+        # Jeśli zmienna ma od razu przypisaną wartość
+        if ctx.wyrazenie_ogolne():
+            wartosc = ctx.wyrazenie_ogolne().getText()
+            # Tłumaczenie polskich słów logicznych na wartości dla C
+            wartosc = wartosc.replace("prawda", "1").replace("falsz", "0")
+            self.kod_c.append(f"    {typ_c} {nazwa} = {wartosc};")
+        else:
+            self.kod_c.append(f"    {typ_c} {nazwa};")
+
+        return None
+
+    # 6. Obsługa przypisania (np. ustaw x = 20)
+    def visitPrzypisanie(self, ctx: SigmaScriptParser.PrzypisanieContext):
+        odwolanie = ctx.odwolanie().getText()
+        wartosc = ctx.wyrazenie_ogolne().getText()
+        wartosc = wartosc.replace("prawda", "1").replace("falsz", "0")
+        self.kod_c.append(f"    {odwolanie} = {wartosc};")
+        return None
+
+    # 7. Obsługa instrukcji warunkowej JEZELI ... INACZEJ
+    def visitInstrukcja_warunkowa(self, ctx: SigmaScriptParser.Instrukcja_warunkowaContext):
+        # Pobieramy polski warunek logiczny z kodu
+        warunek_sigma = ctx.wyrazenie_logiczne().getText()
+
+        # Szybkie tłumaczenie polskich operatorów na C
+        warunek_c = warunek_sigma.replace("oraz", "&&") \
+            .replace("lub", "||") \
+            .replace("prawda", "1") \
+            .replace("falsz", "0") \
+            .replace("nie", "!")
+
+        # Otwieramy IF w C
+        self.kod_c.append(f"    if ({warunek_c}) {{")
+
+        # Odwiedzamy pierwszy blok kodu (wykona się, gdy prawda)
+        self.visit(ctx.blok_kodu(0))
+        self.kod_c.append("    }")
+
+        # Jeśli uczeń dopisał słowo "inaczej" (else), odwiedzamy drugi blok kodu
+        if ctx.INACZEJ():
+            self.kod_c.append("    else {")
+            self.visit(ctx.blok_kodu(1))
+            self.kod_c.append("    }")
+
+        return None
     # (Zostawiamy na razie puste metody na zmienne, żeby uniknąć błędów)
     def visitWypisanie(self, ctx: SigmaScriptParser.WypisanieContext):
         wyrazenie = ctx.wyrazenie_ogolne().getText()
