@@ -301,4 +301,10 @@ Skompilowany program można uruchomić następującym poleceniem na systemach Li
 ./rysownik
 ```
 
+
+# UWAGI
+
 Po wykonaniu programu powinien się wygenerować plik `wynik.svg` z wygenerowanym rysunkiem.
+
+rozszerzyc obsluge bledow, bledy semantyczne, zamienic komunikaty na polskie (bledy ktore nie sa zwiazane z niezgodnoscia z gramatyka)
+wygodny interfejs
