@@ -9,14 +9,14 @@ RUNTIME_C = """#include <stdio.h>
 #include <math.h>
 
 FILE *svg_file;
-float _x = 500.0; // Startujemy na środku płótna 1000x1000
+float _x = 500.0; // poczatek na srodku plotna
 float _y = 500.0;
-float _kat = -90.0; // -90 stopni oznacza, że na początku patrzymy "w górę" ekranu
+float _kat = -90.0; // -90 stopni -- patrzymy w gore
 
 void _init_svg() {
     svg_file = fopen("wynik.svg", "w");
-    fprintf(svg_file, "<svg width=\\"1000\\" height=\\"1000\\" xmlns=\\"http://www.w3.org/2000/svg\\">\\n");
-    fprintf(svg_file, "<rect width=\\"100%%\\" height=\\"100%%\\" fill=\\"#f0f0f0\\"/>\\n"); // Jasnoszare tło
+    fprintf(svg_file, "<svg width=\\"1000\\" height=\\"1000\\" xmlns=\\"http://www.w3.org/2000/svg\\">\\n"); //poczatek svg z deklaracja przestrzeni nazw
+    fprintf(svg_file, "<rect width=\\"100%%\\" height=\\"100%%\\" fill=\\"#f0f0f0\\"/>\\n"); // jasnoszare tlo
 }
 
 void _zapisz_svg() {
@@ -30,10 +30,10 @@ void _naprzod(float dystans) {
     float new_x = _x + dystans * cos(rad);
     float new_y = _y + dystans * sin(rad);
 
-    // Rysujemy linię w SVG
+    // rysujemy linie w svg
     fprintf(svg_file, "<line x1=\\"%.2f\\" y1=\\"%.2f\\" x2=\\"%.2f\\" y2=\\"%.2f\\" stroke=\\"#2c3e50\\" stroke-width=\\"3\\" stroke-linecap=\\"round\\" />\\n", _x, _y, new_x, new_y);
 
-    // Aktualizujemy pozycję
+    // aktualizujemy pozycje
     _x = new_x;
     _y = new_y;
 }
@@ -46,8 +46,8 @@ void _obroc(float zmiana_kata) {
 
 class KompilatorVisitor(SigmaScriptVisitor):
     def __init__(self):
-        self.kod_globalny = []
-        self.kod_main = []
+        self.kod_globalny = [] #na funkcje i struktury
+        self.kod_main = [] #na cala reszte
         self.w_funkcji = False
 
     def dodaj_kod(self, linia):
@@ -89,7 +89,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
             elif "logiczna" in typ_bazowy:
                 typ_c = "int"
             else:
-                typ_c = typ_bazowy  # Pozwala nawet na struktury w strukturach!
+                typ_c = typ_bazowy  # Pozwala nawet na struktury w strukturach
 
             self.dodaj_kod(f"    {typ_c} {nazwa_pola}{wymiar};")
 
@@ -233,7 +233,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
 def main():
     if len(sys.argv) < 2:
-        print("Użycie: python main.py <plik.ss>")
+        print("Uzycie: python main.py <plik.ss>")
         return
 
     plik_wejsciowy = sys.argv[1]
