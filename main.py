@@ -240,7 +240,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
                     return
 
                 # aktualizujemy typ (obsluga zagniezdzen)
-                obecny_typ = struktura[nazwa_pola]
+                obecny_typ = struktura[nazwa_pola]['typ_bazowy']
 
     def tlumacz_wyrazenie(self, ctx):
 
@@ -324,7 +324,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
             for i in range(1, len(identyfikatory)):
                 nazwa_pola = identyfikatory[i].getText()
                 if obecny_typ in self.definicje_struktur and nazwa_pola in self.definicje_struktur[obecny_typ]:
-                    obecny_typ = self.definicje_struktur[obecny_typ][nazwa_pola]
+                    obecny_typ = self.definicje_struktur[obecny_typ][nazwa_pola]['typ_bazowy']
                 else:
                     return None
         return obecny_typ
@@ -333,44 +333,58 @@ class KompilatorVisitor(SigmaScriptVisitor):
     def pobierz_typ_wyrazenia(self, ctx):
         if ctx is None:
             return None
+
+        # zabezpieczenie przed trafieniem w same liscie
+        if isinstance(ctx, TerminalNode):
+            return None
+
+        # konkretne bloki gramatyki - wywolania i odwolania
+        if isinstance(ctx, SigmaScriptParser.Wywolanie_funkcjiContext):
+            nazwa_funkcji = ctx.IDENT().getText()
+            if nazwa_funkcji in self.zadeklarowane_funkcje:
+                return self.zadeklarowane_funkcje[nazwa_funkcji]['typ_zwracany']
+            return None
+
+        if isinstance(ctx, SigmaScriptParser.OdwolanieContext):
+            return self.pobierz_typ_odwolania(ctx)
+
+        # wyrazenia logiczne
+        if isinstance(ctx, SigmaScriptParser.Wyrazenie_logiczneContext):
+            if ctx.ROWNY() or ctx.ROZNY() or ctx.operator_rel() or ctx.ORAZ() or ctx.LUB() or ctx.NIE() or \
+                    (hasattr(ctx, 'PRAWDA') and ctx.PRAWDA()) or (hasattr(ctx, 'FALSZ') and ctx.FALSZ()):
+                return 'logiczna'
+
+        # wyrazenia arytmetyczne
+        if isinstance(ctx, SigmaScriptParser.Wyrazenie_arytmetyczneContext):
+            # dzielenie rzutujemy na float
+            if ctx.PRZEZ():
+                return 'rzeczywista'
+            # sprawdzamy co jest po obu stronach
+            if ctx.PLUS() or ctx.MINUS() or ctx.RAZY():
+                lewy_typ = self.pobierz_typ_wyrazenia(ctx.wyrazenie_arytmetyczne(0))
+                prawy_typ = self.pobierz_typ_wyrazenia(
+                    ctx.wyrazenie_arytmetyczne(1)) if ctx.getChildCount() > 2 else None
+
+                if lewy_typ == 'rzeczywista' or prawy_typ == 'rzeczywista':
+                    return 'rzeczywista'
+                if lewy_typ == 'tekst' or prawy_typ == 'tekst':
+                    return 'tekst'
+                return 'calkowita'
+
+        # sprawdzenie surowych danych
         if hasattr(ctx, 'TEKST') and ctx.TEKST():
             return 'tekst'
-
-        tekst_surowy = ctx.getText()
-
-        # usuwamy indeksy tablicy z analizowanego tekstu
-        tekst_bez_indeksow = re.sub(r'\[.*?\]', '', tekst_surowy)
-
-        # szukamy po wyczyszczonym tekscie
-        odwolania = re.findall(r'[a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*)*', tekst_bez_indeksow)
-        for odw in odwolania:
-            czlon = odw.split('.')
-            if czlon[0] in ['prawda', 'falsz', 'oraz', 'lub', 'nie']:
-                continue
-
-            #weryfikacja czy to wywolanie funkcji
-            if czlon[0] in self.zadeklarowane_funkcje:
-                return self.zadeklarowane_funkcje[czlon[0]]['typ_zwracany']
-
-            typ = self.symbole.pobierz_typ_zmiennej(czlon[0])
-
-            # jesli zmienna jest struktura i wyraznie ma kropki to schodzimy do jej pol
-            if typ:
-                if len(czlon) > 1:
-                    for pole in czlon[1:]:
-                        if typ in self.definicje_struktur and pole in self.definicje_struktur[typ]:
-                            typ = self.definicje_struktur[typ][pole]
-                        else:
-                            return None  # pole nie istnieje
-                #zwracamy faktyczny typ
-                if typ in ['rzeczywista', 'tekst', 'calkowita', 'logiczna', 'pusta']:
-                    return typ
-                else:
-                    return typ  # to jest obiekt struktury (np. 'Punkt')
-
-        # jesli sa kropki ale to nie tekst
-        if '.' in tekst_surowy and '"' not in tekst_surowy:
+        if hasattr(ctx, 'LICZ_RZECZ') and ctx.LICZ_RZECZ():
             return 'rzeczywista'
+        if hasattr(ctx, 'LICZ_CALK') and ctx.LICZ_CALK():
+            return 'calkowita'
+
+        # jesli to wezel nadrzedny
+        for i in range(ctx.getChildCount()):
+            dziecko = ctx.getChild(i)
+            typ = self.pobierz_typ_wyrazenia(dziecko)
+            if typ:
+                return typ
 
         return 'calkowita'  # domyslnie typ calkowity
 
@@ -409,7 +423,13 @@ class KompilatorVisitor(SigmaScriptVisitor):
                     for dekl in s_ctx.deklaracja_zmiennej():
                         typ_bazowy = dekl.typ().getChild(0).getText()
                         nazwa_pola = dekl.IDENT().getText()
-                        self.definicje_struktur[nazwa_struktury][nazwa_pola] = typ_bazowy
+                        czy_tablica = dekl.typ().wymiar_tablicy() is not None
+
+                        # zapisujemy kompleksowa informacje o polu
+                        self.definicje_struktur[nazwa_struktury][nazwa_pola] = {
+                            'typ_bazowy': typ_bazowy,
+                            'czy_tablica': czy_tablica
+                        }
 
         # standardowy przebieg
         self.visitChildren(ctx)
@@ -446,7 +466,10 @@ class KompilatorVisitor(SigmaScriptVisitor):
             wymiar = deklaracja.typ().wymiar_tablicy().getText() if deklaracja.typ().wymiar_tablicy() else ""
 
             # rejestrujemy pole w naszym rejestrze struktur
-            self.definicje_struktur[nazwa_struktury][nazwa_pola] = typ_bazowy
+            self.definicje_struktur[nazwa_struktury][nazwa_pola] = {
+                'typ_bazowy': typ_bazowy,
+                'czy_tablica': bool(wymiar)
+            }
 
             typ_c = self.rozpoznawanie_typow(typ_bazowy)
 
