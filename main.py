@@ -1,6 +1,7 @@
 import sys
 import re
 from antlr4 import *
+from antlr4.tree.Tree import TerminalNode
 from antlr_generated.SigmaScriptLexer import SigmaScriptLexer
 from antlr_generated.SigmaScriptParser import SigmaScriptParser
 from antlr_generated.SigmaScriptVisitor import SigmaScriptVisitor
@@ -174,6 +175,53 @@ class KompilatorVisitor(SigmaScriptVisitor):
         else:
             self.kod_main.append(linia)
 
+    #bezpiecznie wedruje po AST zeby podmienic operatory i uniknac psucia tekstow
+    def tlumacz_wyrazenie(self, ctx):
+
+        if ctx is None:
+            return ""
+
+        # jesli doszlismy do liscia w drzewie
+        if isinstance(ctx, TerminalNode):
+            tekst = ctx.getText()
+            # tlumaczymy wylacznie wyizolowane slowa kluczowe
+            if tekst == 'oraz': return ' && '
+            if tekst == 'lub': return ' || '
+            if tekst == 'nie': return ' ! '
+            if tekst == 'prawda': return ' 1 '
+            if tekst == 'falsz': return ' 0 '
+            return tekst
+
+        # jesli to galez - schodzimy glebiej
+        wynik = ""
+        for i in range(ctx.getChildCount()):
+            wynik += self.tlumacz_wyrazenie(ctx.getChild(i))
+        return wynik
+
+    #do dynamicnzego okreslania typu na potrzeby funkcji wypisz
+    def pobierz_typ_wyrazenia(self, ctx):
+        if ctx.TEKST():
+            return 'tekst'
+
+        tekst_surowy = ctx.getText()
+
+        # wyszukujemy nazwy zmiennych
+        zmienne = re.findall(r'[a-zA-Z_][a-zA-Z0-9_]*', tekst_surowy)
+        for z in zmienne:
+            if z in ['prawda', 'falsz', 'oraz', 'lub', 'nie']:
+                continue
+            typ = self.symbole.pobierz_typ_zmiennej(z)
+            if typ == 'rzeczywista':
+                return 'rzeczywista'
+            elif typ == 'tekst':
+                return 'tekst'
+
+        # jesli sa kropki ale to nie tekst
+        if '.' in tekst_surowy and '"' not in tekst_surowy:
+            return 'rzeczywista'
+
+        return 'calkowita'  # domyslnie typ calkowity
+
     def visitProgram(self, ctx: SigmaScriptParser.ProgramContext):
         print("[Kompilator] Rozpoczynam analizę programu...")
         self.visitChildren(ctx)
@@ -191,7 +239,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
         nazwa_struktury = ctx.IDENT().getText()
         print(f"[Kompilator] Definicja struktury: {nazwa_struktury}")
 
-        self.w_funkcji = True  # Struktury muszą trafić na samą górę pliku C
+        self.w_funkcji = True  # struktury trafiaja na sama gore pliku C
         self.dodaj_kod(f"\ntypedef struct {{")
 
         # Czytamy pola struktury
@@ -207,7 +255,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
             elif "logiczna" in typ_bazowy:
                 typ_c = "int"
             else:
-                typ_c = typ_bazowy  # Pozwala nawet na struktury w strukturach
+                typ_c = typ_bazowy  # pozwala nawet na struktury w strukturach
 
             self.dodaj_kod(f"    {typ_c} {nazwa_pola}{wymiar};")
 
@@ -227,7 +275,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
         elif "pusta" in typ_zwracany:
             typ_c = "void"
         else:
-            typ_c = typ_zwracany  # Zwracanie obiektów struktur
+            typ_c = typ_zwracany  # zwracanie obiektow struktur
 
         nazwa_funkcji = ctx.IDENT().getText()
         print(f"[Kompilator] Deklaracja funkcji: {nazwa_funkcji}")
@@ -243,7 +291,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
                 elif "logiczna" in typ_param_sigma:
                     p_typ = "int"
                 else:
-                    p_typ = typ_param_sigma  # Parametr typu struktury
+                    p_typ = typ_param_sigma  # parametr typu struktury
 
                 parametry_c.append(f"{p_typ} {param.IDENT().getText()}")
 
@@ -258,14 +306,14 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
     def visitInstrukcja_zwrotu(self, ctx: SigmaScriptParser.Instrukcja_zwrotuContext):
         if ctx.wyrazenie_ogolne():
-            wartosc = ctx.wyrazenie_ogolne().getText().replace("prawda", "1").replace("falsz", "0")
+            wartosc = self.tlumacz_wyrazenie(ctx.wyrazenie_ogolne())
             self.dodaj_kod(f"    return {wartosc};")
         else:
             self.dodaj_kod("    return;")
         return None
 
     def visitWywolanie_funkcji(self, ctx: SigmaScriptParser.Wywolanie_funkcjiContext):
-        kod = ctx.getText().replace("prawda", "1").replace("falsz", "0")
+        kod = self.tlumacz_wyrazenie(ctx)
         print(f"[Kompilator] Wywołanie funkcji: {kod}")
         self.dodaj_kod(f"    {kod};")
         return None
@@ -295,14 +343,19 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
         wartosc_c = ""
         if ctx.wyrazenie_ogolne():
-            wartosc_sigma = ctx.wyrazenie_ogolne().getText()
+            wartosc_sigma = self.tlumacz_wyrazenie(ctx.wyrazenie_ogolne())
             if wartosc_sigma.startswith("[") and wartosc_sigma.endswith("]"):
                 wartosc_c = " = {" + wartosc_sigma[1:-1] + "}"
             else:
-                wartosc_c = " = " + wartosc_sigma.replace("prawda", "1").replace("falsz", "0")
+                wartosc_c = " = " + wartosc_sigma
 
         print(f"[Kompilator] Deklaracja zmiennej: {nazwa} ({typ_c})")
-        self.dodaj_kod(f"    {typ_c} {nazwa}{wymiar}{wartosc_c};")
+
+        # jesli jestesmy poza funkcjami (globalnie) - trafia to do globalnego
+        if not self.w_funkcji:
+            self.kod_globalny.append(f"{typ_c} {nazwa}{wymiar}{wartosc_c};")
+        else:
+            self.dodaj_kod(f"    {typ_c} {nazwa}{wymiar}{wartosc_c};")
         return None
 
     def visitPrzypisanie(self, ctx: SigmaScriptParser.PrzypisanieContext):
@@ -319,8 +372,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
             self.bledy_semantyczne.append(blad)
             return None
 
-        # jesli wszystko ok - generujemy kod w C
-        wyrazenie_c = ctx.wyrazenie_ogolne().getText().replace('prawda', '1').replace('falsz', '0')
+        wyrazenie_c = self.tlumacz_wyrazenie(ctx.wyrazenie_ogolne())
         self.dodaj_kod(f"    {pelne_odwolanie} = {wyrazenie_c};")
         return None
 
@@ -336,7 +388,16 @@ class KompilatorVisitor(SigmaScriptVisitor):
         return None
 
     def visitWypisanie(self, ctx):
-        self.dodaj_kod(f"    printf(\"%s\\n\", {ctx.wyrazenie_ogolne().getText()});")
+        wyraz = ctx.wyrazenie_ogolne()
+        typ_wyrazu = self.pobierz_typ_wyrazenia(wyraz)
+        kod_wyrazu = self.tlumacz_wyrazenie(wyraz)
+
+        if typ_wyrazu == 'tekst':
+            self.dodaj_kod(f"    printf(\"%s\\n\", {kod_wyrazu});")
+        elif typ_wyrazu == 'rzeczywista':
+            self.dodaj_kod(f"    printf(\"%f\\n\", {kod_wyrazu});")
+        else:
+            self.dodaj_kod(f"    printf(\"%d\\n\", {kod_wyrazu});")
         return None
 
     def visitPetla(self, ctx: SigmaScriptParser.PetlaContext):
@@ -351,9 +412,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
         return None
 
     def visitPetla_warunkowa(self, ctx: SigmaScriptParser.Petla_warunkowaContext):
-        warunek_c = ctx.wyrazenie_logiczne().getText().replace("oraz", "&&").replace("lub", "||").replace("prawda",
-                                                                                                          "1").replace(
-            "falsz", "0").replace("nie", "!")
+        warunek_c = self.tlumacz_wyrazenie(ctx.wyrazenie_logiczne())
         print(f"[Kompilator] Znalazłem pętlę warunkową (dopoki): {warunek_c}")
         self.dodaj_kod(f"    while ({warunek_c}) {{")
         self.symbole.wejdz_do_bloku()
@@ -363,11 +422,9 @@ class KompilatorVisitor(SigmaScriptVisitor):
         return None
 
     def visitInstrukcja_warunkowa(self, ctx: SigmaScriptParser.Instrukcja_warunkowaContext):
-        warunek = ctx.wyrazenie_logiczne().getText().replace("oraz", "&&").replace("lub", "||").replace("prawda",
-                                                                                                        "1").replace(
-            "falsz", "0").replace("nie", "!")
-        print(f"[Kompilator] Znalazłem instrukcję warunkową (jezeli): {warunek}")
-        self.dodaj_kod(f"    if ({warunek}) {{")
+        warunek_c = self.tlumacz_wyrazenie(ctx.wyrazenie_logiczne())
+        print(f"[Kompilator] Znalazłem instrukcję warunkową (jezeli): {warunek_c}")
+        self.dodaj_kod(f"    if ({warunek_c}) {{")
         self.symbole.wejdz_do_bloku()
         self.visit(ctx.blok_kodu(0))
         self.symbole.wyjdz_z_bloku()
