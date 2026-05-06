@@ -171,6 +171,7 @@ class TabelaSymboli:
 
 class KompilatorVisitor(SigmaScriptVisitor):
     def __init__(self):
+        self.kod_struktur = []
         self.prototypy_funkcji = [] #na prototypy funkcji
         self.kod_globalny = [] #na funkcje i struktury
         self.kod_main = [] #na cala reszte
@@ -436,6 +437,9 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
         ostateczny_kod = [RUNTIME_C]
 
+        if self.kod_struktur:
+            ostateczny_kod.extend(self.kod_struktur)
+
         if self.prototypy_funkcji:
             ostateczny_kod.append("\n//PROTOTYPY FUNKCJI")
             ostateczny_kod.extend(self.prototypy_funkcji)
@@ -455,11 +459,10 @@ class KompilatorVisitor(SigmaScriptVisitor):
         # tworzymy wpis w slowniku struktur
         self.definicje_struktur[nazwa_struktury] = {}
 
-        # struktury trafiaja na sama gore
-        self.w_funkcji = True
-        self.dodaj_kod(f"\ntypedef struct {{")
+        # struktury trafiaja na sama gore - uzywamy dedykowanej listy
+        self.kod_struktur.append(f"\ntypedef struct {{")
 
-        # Czytamy pola struktury
+        # czytamy pola struktury
         for deklaracja in ctx.deklaracja_zmiennej():
             typ_bazowy = deklaracja.typ().getChild(0).getText()
             nazwa_pola = deklaracja.IDENT().getText()
@@ -473,10 +476,10 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
             typ_c = self.rozpoznawanie_typow(typ_bazowy)
 
-            self.dodaj_kod(f"    {typ_c} {nazwa_pola}{wymiar};")
+            self.kod_struktur.append(f"    {typ_c} {nazwa_pola}{wymiar};")
 
-        self.dodaj_kod(f"}} {nazwa_struktury};")
-        self.w_funkcji = False
+        self.kod_struktur.append(f"}} {nazwa_struktury};")
+
         return None
 
     # FUNKCJE
