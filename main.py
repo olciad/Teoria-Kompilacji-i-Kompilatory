@@ -10,6 +10,7 @@ from antlr4.error.ErrorListener import ErrorListener
 # biblioteka runtime
 RUNTIME_C = """#include <stdio.h>
 #include <math.h>
+#include <string.h>
 
 FILE *svg_file;
 float _x = 500.0; // poczatek na srodku plotna
@@ -255,6 +256,24 @@ class KompilatorVisitor(SigmaScriptVisitor):
                 # wywolujemy bezpieczne dzielenie
                 return f"_bezpieczne_dzielenie((float)({lewe}), (float)({prawe}))"
 
+        # porownywanie tekstow z strcmp
+        if isinstance(ctx, SigmaScriptParser.Wyrazenie_logiczneContext):
+            if ctx.ROWNY() or ctx.ROZNY():
+                lewe_ctx = ctx.wyrazenie_logiczne(0)
+                prawe_ctx = ctx.wyrazenie_logiczne(1)
+
+                typ_lewe = self.pobierz_typ_wyrazenia(lewe_ctx)
+                typ_prawe = self.pobierz_typ_wyrazenia(prawe_ctx)
+
+                # rzutujemy == i != na strcmp dla tekstow
+                if typ_lewe == 'tekst' and typ_prawe == 'tekst':
+                    lewe_kod = self.tlumacz_wyrazenie(lewe_ctx)
+                    prawe_kod = self.tlumacz_wyrazenie(prawe_ctx)
+                    if ctx.ROWNY():
+                        return f"(strcmp({lewe_kod}, {prawe_kod}) == 0)"
+                    else:
+                        return f"(strcmp({lewe_kod}, {prawe_kod}) != 0)"
+
         # weryfikacja czy wywolywana funkcja istnieje
         if isinstance(ctx, SigmaScriptParser.Wywolanie_funkcjiContext):
             nazwa_funkcji = ctx.IDENT().getText()
@@ -292,9 +311,29 @@ class KompilatorVisitor(SigmaScriptVisitor):
             wynik += self.tlumacz_wyrazenie(ctx.getChild(i))
         return wynik
 
+    #do okreslenia jakiego typu jest cel do ktorego przypisujemy wartosc
+    def pobierz_typ_odwolania(self, ctx: SigmaScriptParser.OdwolanieContext):
+        glowna_zmienna = ctx.IDENT(0).getText()
+        obecny_typ = self.symbole.pobierz_typ_zmiennej(glowna_zmienna)
+
+        if not obecny_typ:
+            return None
+
+        identyfikatory = ctx.IDENT()
+        if len(identyfikatory) > 1:
+            for i in range(1, len(identyfikatory)):
+                nazwa_pola = identyfikatory[i].getText()
+                if obecny_typ in self.definicje_struktur and nazwa_pola in self.definicje_struktur[obecny_typ]:
+                    obecny_typ = self.definicje_struktur[obecny_typ][nazwa_pola]
+                else:
+                    return None
+        return obecny_typ
+
     #do dynamicnzego okreslania typu na potrzeby funkcji wypisz
     def pobierz_typ_wyrazenia(self, ctx):
-        if ctx.TEKST():
+        if ctx is None:
+            return None
+        if hasattr(ctx, 'TEKST') and ctx.TEKST():
             return 'tekst'
 
         tekst_surowy = ctx.getText()
@@ -311,24 +350,23 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
             #weryfikacja czy to wywolanie funkcji
             if czlon[0] in self.zadeklarowane_funkcje:
-                typ_zwracany = self.zadeklarowane_funkcje[czlon[0]]['typ_zwracany']
-                if typ_zwracany == 'rzeczywista': return 'rzeczywista'
-                if typ_zwracany == 'tekst': return 'tekst'
-                return 'calkowita'
+                return self.zadeklarowane_funkcje[czlon[0]]['typ_zwracany']
 
             typ = self.symbole.pobierz_typ_zmiennej(czlon[0])
 
             # jesli zmienna jest struktura i wyraznie ma kropki to schodzimy do jej pol
-            if typ and len(czlon) > 1:
-                for pole in czlon[1:]:
-                    if typ in self.definicje_struktur and pole in self.definicje_struktur[typ]:
-                        typ = self.definicje_struktur[typ][pole]
-
-            # sprawdzamy ostateczny lisc z naszej sciezki
-            if typ == 'rzeczywista':
-                return 'rzeczywista'
-            elif typ == 'tekst':
-                return 'tekst'
+            if typ:
+                if len(czlon) > 1:
+                    for pole in czlon[1:]:
+                        if typ in self.definicje_struktur and pole in self.definicje_struktur[typ]:
+                            typ = self.definicje_struktur[typ][pole]
+                        else:
+                            return None  # pole nie istnieje
+                #zwracamy faktyczny typ
+                if typ in ['rzeczywista', 'tekst', 'calkowita', 'logiczna', 'pusta']:
+                    return typ
+                else:
+                    return typ  # to jest obiekt struktury (np. 'Punkt')
 
         # jesli sa kropki ale to nie tekst
         if '.' in tekst_surowy and '"' not in tekst_surowy:
@@ -345,21 +383,33 @@ class KompilatorVisitor(SigmaScriptVisitor):
             if definicja.definicja_funkcji():
                 f_ctx = definicja.definicja_funkcji()
                 nazwa = f_ctx.IDENT().getText()
-                typ_zwracany = f_ctx.typ_zwracany().getText()
-                parametry = len(f_ctx.parametry().parametr()) if f_ctx.parametry() else 0
-                self.zadeklarowane_funkcje[nazwa] = {
-                    'parametry': parametry,
-                    'typ_zwracany': typ_zwracany
-                }
+
+                # zabezpieczenie przed powtorzona nazwa funkcji
+                if nazwa in self.zadeklarowane_funkcje or nazwa in self.definicje_struktur:
+                    self.bledy_semantyczne.append(
+                        f"[!] Błąd logiczny: Nazwa funkcji '{nazwa}' jest już zajęta przez inną strukturę lub funkcję!")
+                else:
+                    typ_zwracany = f_ctx.typ_zwracany().getText()
+                    parametry = len(f_ctx.parametry().parametr()) if f_ctx.parametry() else 0
+                    self.zadeklarowane_funkcje[nazwa] = {
+                        'parametry': parametry,
+                        'typ_zwracany': typ_zwracany
+                    }
             # rejestracja struktur
             elif definicja.definicja_struktury():
                 s_ctx = definicja.definicja_struktury()
                 nazwa_struktury = s_ctx.IDENT().getText()
-                self.definicje_struktur[nazwa_struktury] = {}
-                for dekl in s_ctx.deklaracja_zmiennej():
-                    typ_bazowy = dekl.typ().getChild(0).getText()
-                    nazwa_pola = dekl.IDENT().getText()
-                    self.definicje_struktur[nazwa_struktury][nazwa_pola] = typ_bazowy
+
+                # zabezpieczenie przed powtorzona nazwa struktury
+                if nazwa_struktury in self.definicje_struktur or nazwa_struktury in self.zadeklarowane_funkcje:
+                    self.bledy_semantyczne.append(
+                        f"[!] Błąd logiczny: Nazwa struktury '{nazwa_struktury}' jest już zajęta przez inną strukturę lub funkcję!")
+                else:
+                    self.definicje_struktur[nazwa_struktury] = {}
+                    for dekl in s_ctx.deklaracja_zmiennej():
+                        typ_bazowy = dekl.typ().getChild(0).getText()
+                        nazwa_pola = dekl.IDENT().getText()
+                        self.definicje_struktur[nazwa_struktury][nazwa_pola] = typ_bazowy
 
         # standardowy przebieg
         self.visitChildren(ctx)
@@ -558,14 +608,22 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
         #sprawdzamy czy zmienna istnieje
         if typ_zmiennej is None:
-            blad = f"[!] Błąd logiczny: Próbujesz zmienić wartość '{glowna_zmienna}', ale taka zmienna nie istnieje (lub nie jest tu widoczna)!"
-            self.bledy_semantyczne.append(blad)
+            blad = f"[!] Błąd logiczny: Próbujesz zmienić wartość '{glowna_zmienna}', ale taka zmienna nie istnieje!"
+            if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
             return None
 
         # weryfikacja wywolan pol
         self.weryfikuj_odwolanie(ctx.odwolanie())
 
         wyrazenie_c = self.tlumacz_wyrazenie(ctx.wyrazenie_ogolne())
+
+        # scisla kontrola typow
+        typ_docelowy = self.pobierz_typ_odwolania(ctx.odwolanie())
+        typ_wyrazenia = self.pobierz_typ_wyrazenia(ctx.wyrazenie_ogolne())
+
+        if typ_docelowy and typ_wyrazenia and typ_docelowy != typ_wyrazenia:
+            blad = f"[!] Błąd logiczny: Niezgodność typów! Próba przypisania wartości typu '{typ_wyrazenia}' do zmiennej typu '{typ_docelowy}'."
+            if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
 
         # blokada przypisywania calej tablicy po deklaracji
         if wyrazenie_c.startswith("[") and wyrazenie_c.endswith("]"):
@@ -590,6 +648,13 @@ class KompilatorVisitor(SigmaScriptVisitor):
     def visitWypisanie(self, ctx):
         wyraz = ctx.wyrazenie_ogolne()
         typ_wyrazu = self.pobierz_typ_wyrazenia(wyraz)
+
+        # zabezpieczenie przed wypisywaniem calych struktur
+        if typ_wyrazu in self.definicje_struktur:
+            blad = f"[!] Błąd logiczny: Nie można wypisać całego obiektu typu '{typ_wyrazu}'. Odwołaj się do konkretnego pola tej struktury!"
+            if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+            return None
+
         kod_wyrazu = self.tlumacz_wyrazenie(wyraz)
 
         if typ_wyrazu == 'tekst':
