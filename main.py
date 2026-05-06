@@ -44,6 +44,15 @@ void _naprzod(float dystans) {
 void _obroc(float zmiana_kata) {
     _kat += zmiana_kata;
 }
+
+//ochrona przed dzieleniem przez zero
+float _bezpieczne_dzielenie(float a, float b) {
+    if (b == 0.0) {
+        printf("[!] Ostrzeżenie: Próbowano podzielić przez zero! Wynik zamieniono na 0, aby program mógł działać dalej.\\n");
+        return 0.0;
+    }
+    return a / b;
+}
 """
 
 class PolskiErrorListener(ErrorListener):
@@ -165,8 +174,9 @@ class KompilatorVisitor(SigmaScriptVisitor):
         self.kod_main = [] #na cala reszte
         self.w_funkcji = False
 
-        # tabela symboli i bledow semantycznych
+        # tabela symboli, rejestr struktur i tablica bledow semantycznych
         self.symbole = TabelaSymboli()
+        self.definicje_struktur = {}
         self.bledy_semantyczne = []
 
     def dodaj_kod(self, linia):
@@ -175,11 +185,57 @@ class KompilatorVisitor(SigmaScriptVisitor):
         else:
             self.kod_main.append(linia)
 
-    #bezpiecznie wedruje po AST zeby podmienic operatory i uniknac psucia tekstow
+    # weryfikacja odwolan do pol struktur
+    def weryfikuj_odwolanie(self, ctx: SigmaScriptParser.OdwolanieContext):
+        glowna_zmienna = ctx.IDENT(0).getText()
+        typ_zmiennej = self.symbole.pobierz_typ_zmiennej(glowna_zmienna)
+
+        # jesli zmienna nie istnieje - pomijamy
+        if typ_zmiennej is None:
+            return
+
+        # sprawdzamy czy sa odwolania do pol
+        if len(ctx.IDENT()) > 1:
+            obecny_typ = typ_zmiennej
+            identyfikatory = ctx.IDENT()
+
+            for i in range(1, len(identyfikatory)):
+                nazwa_pola = identyfikatory[i].getText()
+
+                # czy to na pewno struktura
+                if obecny_typ not in self.definicje_struktur:
+                    blad = f"[!] Błąd logiczny: Zmienna '{identyfikatory[i - 1].getText()}' (typu {obecny_typ}) nie jest strukturą i nie posiada pól!"
+                    if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+                    return
+
+                struktura = self.definicje_struktur[obecny_typ]
+
+                # czy pole istnieje w strukturze
+                if nazwa_pola not in struktura:
+                    blad = f"[!] Błąd logiczny: Struktura '{obecny_typ}' nie posiada pola o nazwie '{nazwa_pola}'!"
+                    if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+                    return
+
+                # aktualizujemy typ (obsluga zagniezdzen)
+                obecny_typ = struktura[nazwa_pola]
+
     def tlumacz_wyrazenie(self, ctx):
 
         if ctx is None:
             return ""
+
+        # zabezpieczenie przed dzieleniem przez zero w wyrazeniach
+        if isinstance(ctx, SigmaScriptParser.Wyrazenie_arytmetyczneContext):
+            if ctx.PRZEZ():
+                # tlumaczymy lewa i prawa strone
+                lewe = self.tlumacz_wyrazenie(ctx.wyrazenie_arytmetyczne(0))
+                prawe = self.tlumacz_wyrazenie(ctx.wyrazenie_arytmetyczne(1))
+                # wywolujemy bezpieczne dzielenie
+                return f"_bezpieczne_dzielenie((float)({lewe}), (float)({prawe}))"
+
+        # weryfikacja wywolan pol uzywanych w wyrazeniach
+        if isinstance(ctx, SigmaScriptParser.OdwolanieContext):
+            self.weryfikuj_odwolanie(ctx)
 
         # jesli doszlismy do liscia w drzewie
         if isinstance(ctx, TerminalNode):
@@ -206,11 +262,21 @@ class KompilatorVisitor(SigmaScriptVisitor):
         tekst_surowy = ctx.getText()
 
         # wyszukujemy nazwy zmiennych
-        zmienne = re.findall(r'[a-zA-Z_][a-zA-Z0-9_]*', tekst_surowy)
-        for z in zmienne:
-            if z in ['prawda', 'falsz', 'oraz', 'lub', 'nie']:
+        odwolania = re.findall(r'[a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*)*', tekst_surowy)
+        for odw in odwolania:
+            czlon = odw.split('.')
+            if czlon[0] in ['prawda', 'falsz', 'oraz', 'lub', 'nie']:
                 continue
-            typ = self.symbole.pobierz_typ_zmiennej(z)
+
+            typ = self.symbole.pobierz_typ_zmiennej(czlon[0])
+
+            # jesli zmienna jest struktura i wyraznie ma kropki to schodzimy do jej pol
+            if typ and len(czlon) > 1:
+                for pole in czlon[1:]:
+                    if typ in self.definicje_struktur and pole in self.definicje_struktur[typ]:
+                        typ = self.definicje_struktur[typ][pole]
+
+            # sprawdzamy ostateczny lisc z naszej sciezki
             if typ == 'rzeczywista':
                 return 'rzeczywista'
             elif typ == 'tekst':
@@ -239,7 +305,11 @@ class KompilatorVisitor(SigmaScriptVisitor):
         nazwa_struktury = ctx.IDENT().getText()
         print(f"[Kompilator] Definicja struktury: {nazwa_struktury}")
 
-        self.w_funkcji = True  # struktury trafiaja na sama gore pliku C
+        # tworzymy wpis w slowniku struktur
+        self.definicje_struktur[nazwa_struktury] = {}
+
+        # struktury trafiaja na sama gore
+        self.w_funkcji = True
         self.dodaj_kod(f"\ntypedef struct {{")
 
         # Czytamy pola struktury
@@ -247,6 +317,9 @@ class KompilatorVisitor(SigmaScriptVisitor):
             typ_bazowy = deklaracja.typ().getChild(0).getText()
             nazwa_pola = deklaracja.IDENT().getText()
             wymiar = deklaracja.typ().wymiar_tablicy().getText() if deklaracja.typ().wymiar_tablicy() else ""
+
+            # rejestrujemy pole w naszym rejestrze struktur
+            self.definicje_struktur[nazwa_struktury][nazwa_pola] = typ_bazowy
 
             if "calkowita" in typ_bazowy:
                 typ_c = "int"
@@ -298,6 +371,12 @@ class KompilatorVisitor(SigmaScriptVisitor):
         self.w_funkcji = True
         self.dodaj_kod(f"\n{typ_c} {nazwa_funkcji}({', '.join(parametry_c)}) {{")
         self.symbole.wejdz_do_bloku()
+        # rejestrujemy parametry w lokalnej tablicy symboli
+        if ctx.parametry():
+            for param in ctx.parametry().parametr():
+                typ_param_sigma = param.typ().getChild(0).getText()
+                nazwa_param = param.IDENT().getText()
+                self.symbole.dodaj_zmienna(nazwa_param, typ_param_sigma)
         self.visit(ctx.blok_kodu())
         self.symbole.wyjdz_z_bloku()
         self.dodaj_kod("}")
@@ -328,7 +407,6 @@ class KompilatorVisitor(SigmaScriptVisitor):
         sukces = self.symbole.dodaj_zmienna(nazwa, typ_bazowy)
         if not sukces:
             blad = f"[!] Błąd logiczny: Zmienna '{nazwa}' jest już zadeklarowana w tym bloku kodu!"
-            print(blad)
             self.bledy_semantyczne.append(blad)
             return None
 
@@ -351,11 +429,20 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
         print(f"[Kompilator] Deklaracja zmiennej: {nazwa} ({typ_c})")
 
-        # jesli jestesmy poza funkcjami (globalnie) - trafia to do globalnego
+        # jesli jestesmy poza funkcjami (globalnie)
         if not self.w_funkcji:
-            self.kod_globalny.append(f"{typ_c} {nazwa}{wymiar}{wartosc_c};")
+            # tablice inicjalizujemy globalnie
+            if wartosc_c and wartosc_c.startswith(" = {"):
+                self.kod_globalny.append(f"{typ_c} {nazwa}{wymiar}{wartosc_c};")
+            else:
+                # rozdzielamy deklaracje od inicjalizacji
+                self.kod_globalny.append(f"{typ_c} {nazwa}{wymiar};")
+                if wartosc_c:
+                    self.kod_main.append(f"    {nazwa}{wartosc_c};")
         else:
+            #wewnatrz funkcji deklarujemy standardowo
             self.dodaj_kod(f"    {typ_c} {nazwa}{wymiar}{wartosc_c};")
+
         return None
 
     def visitPrzypisanie(self, ctx: SigmaScriptParser.PrzypisanieContext):
@@ -368,9 +455,11 @@ class KompilatorVisitor(SigmaScriptVisitor):
         #sprawdzamy czy zmienna istnieje
         if typ_zmiennej is None:
             blad = f"[!] Błąd logiczny: Próbujesz zmienić wartość '{glowna_zmienna}', ale taka zmienna nie istnieje (lub nie jest tu widoczna)!"
-            print(blad)
             self.bledy_semantyczne.append(blad)
             return None
+
+        # weryfikacja wywolan pol
+        self.weryfikuj_odwolanie(ctx.odwolanie())
 
         wyrazenie_c = self.tlumacz_wyrazenie(ctx.wyrazenie_ogolne())
         self.dodaj_kod(f"    {pelne_odwolanie} = {wyrazenie_c};")
@@ -401,7 +490,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
         return None
 
     def visitPetla(self, ctx: SigmaScriptParser.PetlaContext):
-        ile = ctx.wyrazenie_arytmetyczne().getText()
+        ile = self.tlumacz_wyrazenie(ctx.wyrazenie_arytmetyczne())
         print(f"[Kompilator] Znalazłem pętlę: powtorz {ile}")
         z_petli = f"_i_{id(ctx)}"
         self.dodaj_kod(f"    for(int {z_petli} = 0; {z_petli} < (int)({ile}); {z_petli}++) {{")
@@ -469,6 +558,8 @@ def main():
 
     if len(visitor.bledy_semantyczne) > 0:
         print("\n[!] Znalazłem błędy logiczne w Twoim kodzie. Popraw je, aby przejść dalej!")
+        for blad in visitor.bledy_semantyczne:
+            print(blad)
         return
 
     with open("wynik.c", "w", encoding='utf-8') as f:
