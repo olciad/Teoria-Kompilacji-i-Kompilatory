@@ -133,15 +133,39 @@ class TabelaSymboli:
         # stos slownikow do obslugi zasiegow
         self.stos_zasiegow = [{}]
 
+    #wywolywane gdy wchodzimy do nawiasow
+    def wejdz_do_bloku(self):
+        self.stos_zasiegow.append({})
+
+    #wywolywane gdy wychodzimy z nawiasow
+    def wyjdz_z_bloku(self):
+        if len(self.stos_zasiegow) > 1:
+            self.stos_zasiegow.pop()
+
+    #dodaje zmienna do obecnego bloku kodu
+    def dodaj_zmienna(self, nazwa, typ):
+        obecny_zasieg = self.stos_zasiegow[-1]
+        if nazwa in obecny_zasieg:
+            return False  # rzucamy blad - zmienna juz istnieje w bloku
+
+        obecny_zasieg[nazwa] = {'typ': typ}
+        return True
+
+    #szuka zmiennej od obecnego do globalnego bloku
+    def pobierz_typ_zmiennej(self, nazwa):
+        for zasieg in reversed(self.stos_zasiegow):
+            if nazwa in zasieg:
+                return zasieg[nazwa]['typ']
+        return None  # rzucamy blad gdy zmienna nie istnieje
+
 class KompilatorVisitor(SigmaScriptVisitor):
     def __init__(self):
         self.kod_globalny = [] #na funkcje i struktury
         self.kod_main = [] #na cala reszte
         self.w_funkcji = False
 
-        #tabela symboli i bledy semantyczne
-        self.zadeklarowane_zmienne = set()
-        self.zadeklarowane_struktury = set()
+        # tabela symboli i bledow semantycznych
+        self.symbole = TabelaSymboli()
         self.bledy_semantyczne = []
 
     def dodaj_kod(self, linia):
@@ -225,7 +249,9 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
         self.w_funkcji = True
         self.dodaj_kod(f"\n{typ_c} {nazwa_funkcji}({', '.join(parametry_c)}) {{")
+        self.symbole.wejdz_do_bloku()
         self.visit(ctx.blok_kodu())
+        self.symbole.wyjdz_z_bloku()
         self.dodaj_kod("}")
         self.w_funkcji = False
         return None
@@ -251,13 +277,12 @@ class KompilatorVisitor(SigmaScriptVisitor):
         nazwa = ctx.IDENT().getText()
 
         # sprawdzenie czy zmienna juz istnieje
-        if nazwa in self.zadeklarowane_zmienne:
-            blad = f"Błąd logiczny: Zmienna o nazwie '{nazwa}' została już wcześniej stworzona!"
+        sukces = self.symbole.dodaj_zmienna(nazwa, typ_bazowy)
+        if not sukces:
+            blad = f"[!] Błąd logiczny: Zmienna '{nazwa}' jest już zadeklarowana w tym bloku kodu!"
             print(blad)
             self.bledy_semantyczne.append(blad)
-            return None  # przerywamy przetwarzanie tej zmiennej
-
-        self.zadeklarowane_zmienne.add(nazwa)
+            return None
 
         if "calkowita" in typ_bazowy:
             typ_c = "int"
@@ -282,12 +307,14 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
     def visitPrzypisanie(self, ctx: SigmaScriptParser.PrzypisanieContext):
         pelne_odwolanie = ctx.odwolanie().getText()
-
         glowna_zmienna = ctx.odwolanie().IDENT(0).getText()
 
+        #pobieramy typ zmiennej
+        typ_zmiennej = self.symbole.pobierz_typ_zmiennej(glowna_zmienna)
+
         #sprawdzamy czy zmienna istnieje
-        if glowna_zmienna not in self.zadeklarowane_zmienne:
-            blad = f"Błąd logiczny: Próbujesz zmienić wartość '{glowna_zmienna}', ale taka zmienna nie została zadeklarowana!"
+        if typ_zmiennej is None:
+            blad = f"[!] Błąd logiczny: Próbujesz zmienić wartość '{glowna_zmienna}', ale taka zmienna nie istnieje (lub nie jest tu widoczna)!"
             print(blad)
             self.bledy_semantyczne.append(blad)
             return None
@@ -317,7 +344,9 @@ class KompilatorVisitor(SigmaScriptVisitor):
         print(f"[Kompilator] Znalazłem pętlę: powtorz {ile}")
         z_petli = f"_i_{id(ctx)}"
         self.dodaj_kod(f"    for(int {z_petli} = 0; {z_petli} < (int)({ile}); {z_petli}++) {{")
+        self.symbole.wejdz_do_bloku()
         self.visit(ctx.blok_kodu())
+        self.symbole.wyjdz_z_bloku()
         self.dodaj_kod("    }")
         return None
 
@@ -327,7 +356,9 @@ class KompilatorVisitor(SigmaScriptVisitor):
             "falsz", "0").replace("nie", "!")
         print(f"[Kompilator] Znalazłem pętlę warunkową (dopoki): {warunek_c}")
         self.dodaj_kod(f"    while ({warunek_c}) {{")
+        self.symbole.wejdz_do_bloku()
         self.visit(ctx.blok_kodu())
+        self.symbole.wyjdz_z_bloku()
         self.dodaj_kod("    }")
         return None
 
@@ -337,11 +368,15 @@ class KompilatorVisitor(SigmaScriptVisitor):
             "falsz", "0").replace("nie", "!")
         print(f"[Kompilator] Znalazłem instrukcję warunkową (jezeli): {warunek}")
         self.dodaj_kod(f"    if ({warunek}) {{")
+        self.symbole.wejdz_do_bloku()
         self.visit(ctx.blok_kodu(0))
+        self.symbole.wyjdz_z_bloku()
         self.dodaj_kod("    }")
         if ctx.INACZEJ():
             self.dodaj_kod("    else {")
+            self.symbole.wejdz_do_bloku()
             self.visit(ctx.blok_kodu(1))
+            self.symbole.wyjdz_z_bloku()
             self.dodaj_kod("    }")
         return None
 
