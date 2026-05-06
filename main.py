@@ -174,9 +174,10 @@ class KompilatorVisitor(SigmaScriptVisitor):
         self.kod_main = [] #na cala reszte
         self.w_funkcji = False
 
-        # tabela symboli, rejestr struktur i tablica bledow semantycznych
+        # tabela symboli, rejestr struktur, rejestr funkcji i tablica bledow semantycznych
         self.symbole = TabelaSymboli()
         self.definicje_struktur = {}
+        self.zadeklarowane_funkcje = []
         self.bledy_semantyczne = []
 
     def dodaj_kod(self, linia):
@@ -190,8 +191,11 @@ class KompilatorVisitor(SigmaScriptVisitor):
         glowna_zmienna = ctx.IDENT(0).getText()
         typ_zmiennej = self.symbole.pobierz_typ_zmiennej(glowna_zmienna)
 
-        # jesli zmienna nie istnieje - pomijamy
+        # jesli zmienna nie istnieje - zglaszamy blad
         if typ_zmiennej is None:
+            blad = f"[!] Błąd logiczny: Użyto zmiennej '{glowna_zmienna}', która nie została wcześniej zadeklarowana!"
+            if blad not in self.bledy_semantyczne:
+                self.bledy_semantyczne.append(blad)
             return
 
         # sprawdzamy czy sa odwolania do pol
@@ -232,6 +236,14 @@ class KompilatorVisitor(SigmaScriptVisitor):
                 prawe = self.tlumacz_wyrazenie(ctx.wyrazenie_arytmetyczne(1))
                 # wywolujemy bezpieczne dzielenie
                 return f"_bezpieczne_dzielenie((float)({lewe}), (float)({prawe}))"
+
+        # weryfikacja czy wywolywana funkcja istnieje
+        if isinstance(ctx, SigmaScriptParser.Wywolanie_funkcjiContext):
+            nazwa_funkcji = ctx.IDENT().getText()
+            if nazwa_funkcji not in self.zadeklarowane_funkcje:
+                blad = f"[!] Błąd logiczny: Próba wywołania nieznanej funkcji '{nazwa_funkcji}'!"
+                if blad not in self.bledy_semantyczne:
+                    self.bledy_semantyczne.append(blad)
 
         # weryfikacja wywolan pol uzywanych w wyrazeniach
         if isinstance(ctx, SigmaScriptParser.OdwolanieContext):
@@ -327,6 +339,8 @@ class KompilatorVisitor(SigmaScriptVisitor):
                 typ_c = "float"
             elif "logiczna" in typ_bazowy:
                 typ_c = "int"
+            elif "tekst" in typ_bazowy:
+                typ_c = "char*"
             else:
                 typ_c = typ_bazowy  # pozwala nawet na struktury w strukturach
 
@@ -347,26 +361,34 @@ class KompilatorVisitor(SigmaScriptVisitor):
             typ_c = "int"
         elif "pusta" in typ_zwracany:
             typ_c = "void"
+        elif "tekst" in typ_zwracany:
+            typ_c = "char*"
         else:
             typ_c = typ_zwracany  # zwracanie obiektow struktur
 
         nazwa_funkcji = ctx.IDENT().getText()
         print(f"[Kompilator] Deklaracja funkcji: {nazwa_funkcji}")
+        self.zadeklarowane_funkcje.append(nazwa_funkcji)
 
         parametry_c = []
         if ctx.parametry():
             for param in ctx.parametry().parametr():
                 typ_param_sigma = param.typ().getChild(0).getText()
+                wymiar = param.typ().wymiar_tablicy().getText() if param.typ().wymiar_tablicy() else ""
+
                 if "calkowita" in typ_param_sigma:
                     p_typ = "int"
                 elif "rzeczywista" in typ_param_sigma:
                     p_typ = "float"
                 elif "logiczna" in typ_param_sigma:
                     p_typ = "int"
+                elif "tekst" in typ_param_sigma:
+                    p_typ = "char*"
                 else:
                     p_typ = typ_param_sigma  # parametr typu struktury
 
-                parametry_c.append(f"{p_typ} {param.IDENT().getText()}")
+                # typ, nazwa oraz ewentualny wymiar tablicy
+                parametry_c.append(f"{p_typ} {param.IDENT().getText()}{wymiar}")
 
         self.w_funkcji = True
         self.dodaj_kod(f"\n{typ_c} {nazwa_funkcji}({', '.join(parametry_c)}) {{")
@@ -416,6 +438,8 @@ class KompilatorVisitor(SigmaScriptVisitor):
             typ_c = "float"
         elif "logiczna" in typ_bazowy:
             typ_c = "int"
+        elif "tekst" in typ_bazowy:
+            typ_c = "char*"
         else:
             typ_c = typ_bazowy  # obsluga inicjalizacji struktury: Dron moj_dron
 
