@@ -170,9 +170,11 @@ class TabelaSymboli:
 
 class KompilatorVisitor(SigmaScriptVisitor):
     def __init__(self):
+        self.prototypy_funkcji = [] #na prototypy funkcji
         self.kod_globalny = [] #na funkcje i struktury
         self.kod_main = [] #na cala reszte
         self.w_funkcji = False
+        self.oczekiwany_typ_zwracany = None
 
         # tabela symboli, rejestr struktur, rejestr funkcji i tablica bledow semantycznych
         self.symbole = TabelaSymboli()
@@ -336,9 +338,38 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
     def visitProgram(self, ctx: SigmaScriptParser.ProgramContext):
         print("[Kompilator] Rozpoczynam analizę programu...")
+
+        # skanowanie wstepne (rejestracja funkcji i struktur)
+        for definicja in ctx.definicja():
+            # rejestracja funkcji
+            if definicja.definicja_funkcji():
+                f_ctx = definicja.definicja_funkcji()
+                nazwa = f_ctx.IDENT().getText()
+                typ_zwracany = f_ctx.typ_zwracany().getText()
+                parametry = len(f_ctx.parametry().parametr()) if f_ctx.parametry() else 0
+                self.zadeklarowane_funkcje[nazwa] = {
+                    'parametry': parametry,
+                    'typ_zwracany': typ_zwracany
+                }
+            # rejestracja struktur
+            elif definicja.definicja_struktury():
+                s_ctx = definicja.definicja_struktury()
+                nazwa_struktury = s_ctx.IDENT().getText()
+                self.definicje_struktur[nazwa_struktury] = {}
+                for dekl in s_ctx.deklaracja_zmiennej():
+                    typ_bazowy = dekl.typ().getChild(0).getText()
+                    nazwa_pola = dekl.IDENT().getText()
+                    self.definicje_struktur[nazwa_struktury][nazwa_pola] = typ_bazowy
+
+        # standardowy przebieg
         self.visitChildren(ctx)
 
         ostateczny_kod = [RUNTIME_C]
+
+        if self.prototypy_funkcji:
+            ostateczny_kod.append("\n//PROTOTYPY FUNKCJI")
+            ostateczny_kod.extend(self.prototypy_funkcji)
+
         ostateczny_kod.extend(self.kod_globalny)
         ostateczny_kod.append("\nint main() {")
         ostateczny_kod.append("    _init_svg();")
@@ -402,7 +433,14 @@ class KompilatorVisitor(SigmaScriptVisitor):
                 # typ, nazwa oraz ewentualny wymiar tablicy
                 parametry_c.append(f"{p_typ} {param.IDENT().getText()}{wymiar}")
 
+        # rejestracja prototypu funkcji
+        prototyp = f"{typ_c} {nazwa_funkcji}({', '.join(parametry_c)});"
+        if prototyp not in self.prototypy_funkcji:
+            self.prototypy_funkcji.append(prototyp)
+
         self.w_funkcji = True
+        self.oczekiwany_typ_zwracany = typ_zwracany
+
         self.dodaj_kod(f"\n{typ_c} {nazwa_funkcji}({', '.join(parametry_c)}) {{")
         self.symbole.wejdz_do_bloku()
         # rejestrujemy parametry w lokalnej tablicy symboli
@@ -412,6 +450,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
                 nazwa_param = param.IDENT().getText()
                 self.symbole.dodaj_zmienna(nazwa_param, typ_param_sigma)
         self.visit(ctx.blok_kodu())
+        self.oczekiwany_typ_zwracany = None
         self.symbole.wyjdz_z_bloku()
         self.dodaj_kod("}")
         self.w_funkcji = False
@@ -419,6 +458,26 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
     def visitInstrukcja_zwrotu(self, ctx: SigmaScriptParser.Instrukcja_zwrotuContext):
         wartosc = self.tlumacz_wyrazenie(ctx.wyrazenie_ogolne()) if ctx.wyrazenie_ogolne() else ""
+
+        # walidacja typu zwracanego
+        if self.w_funkcji:
+            if wartosc:
+                # pobieramy faktyczny typ
+                faktyczny_typ = self.pobierz_typ_wyrazenia(ctx.wyrazenie_ogolne())
+
+                # upewniamy sie ze nie zwracamy wartosci z funkcji typu pusta
+                if self.oczekiwany_typ_zwracany == "pusta":
+                    blad = f"[!] Błąd logiczny: Próbujesz zwrócić wartość, ale funkcja została oznaczona jako 'pusta' (niezwracająca niczego)!"
+                    if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+                # porownujemy typ deklarowany z faktycznym
+                elif faktyczny_typ != self.oczekiwany_typ_zwracany:
+                    blad = f"[!] Błąd logiczny: Funkcja powinna zwracać typ '{self.oczekiwany_typ_zwracany}', a próbuje zwrócić '{faktyczny_typ}'!"
+                    if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+            else:
+                # puste zwroc w funkcji innej niz pusta
+                if self.oczekiwany_typ_zwracany != "pusta":
+                    blad = f"[!] Błąd logiczny: Użyto instrukcji 'zwroc;' bez podania wartości, mimo że funkcja wymaga typu '{self.oczekiwany_typ_zwracany}'!"
+                    if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
 
         if not self.w_funkcji:
             # jestesmy w programie glownym wiec zapisujemy plik svg przed wyjsciem
@@ -463,6 +522,12 @@ class KompilatorVisitor(SigmaScriptVisitor):
                 wartosc_c = " = {" + wartosc_sigma[1:-1] + "}"
             else:
                 wartosc_c = " = " + wartosc_sigma
+
+        # walidacja pustych tablic
+        if wymiar == "[]" and not wartosc_c:
+            blad = f"[!] Błąd logiczny: Tablica '{nazwa}' musi mieć z góry określony rozmiar (np. calkowita[10] {nazwa}) lub zostać natychmiast zainicjowana wartościami!"
+            self.bledy_semantyczne.append(blad)
+            return None
 
         print(f"[Kompilator] Deklaracja zmiennej: {nazwa} ({typ_c})")
 
