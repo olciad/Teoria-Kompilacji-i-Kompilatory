@@ -6,6 +6,44 @@ from antlr_generated.SigmaScriptParser import SigmaScriptParser
 from antlr_generated.SigmaScriptVisitor import SigmaScriptVisitor
 from antlr4.error.ErrorListener import ErrorListener
 
+# biblioteka runtime
+RUNTIME_C = """#include <stdio.h>
+#include <math.h>
+
+FILE *svg_file;
+float _x = 500.0; // poczatek na srodku plotna
+float _y = 500.0;
+float _kat = -90.0; // -90 stopni -- patrzymy w gore
+
+void _init_svg() {
+    svg_file = fopen("wynik.svg", "w");
+    fprintf(svg_file, "<svg width=\\"1000\\" height=\\"1000\\" xmlns=\\"http://www.w3.org/2000/svg\\">\\n"); //poczatek svg z deklaracja przestrzeni nazw
+    fprintf(svg_file, "<rect width=\\"100%%\\" height=\\"100%%\\" fill=\\"#f0f0f0\\"/>\\n"); // jasnoszare tlo
+}
+
+void _zapisz_svg() {
+    fprintf(svg_file, "</svg>\\n");
+    fclose(svg_file);
+    printf("[Zolw] Misja zakonczona. Wygenerowano plik wynik.svg!\\n");
+}
+
+void _naprzod(float dystans) {
+    float rad = _kat * (3.14159265 / 180.0);
+    float new_x = _x + dystans * cos(rad);
+    float new_y = _y + dystans * sin(rad);
+
+    // rysujemy linie w svg
+    fprintf(svg_file, "<line x1=\\"%.2f\\" y1=\\"%.2f\\" x2=\\"%.2f\\" y2=\\"%.2f\\" stroke=\\"#2c3e50\\" stroke-width=\\"3\\" stroke-linecap=\\"round\\" />\\n", _x, _y, new_x, new_y);
+
+    // aktualizujemy pozycje
+    _x = new_x;
+    _y = new_y;
+}
+
+void _obroc(float zmiana_kata) {
+    _kat += zmiana_kata;
+}
+"""
 
 class PolskiErrorListener(ErrorListener):
     def __init__(self):
@@ -90,45 +128,10 @@ class PolskiErrorListener(ErrorListener):
         self.bledy.append(blad)
         print(blad)
 
-# biblioteka runtime
-RUNTIME_C = """#include <stdio.h>
-#include <math.h>
-
-FILE *svg_file;
-float _x = 500.0; // poczatek na srodku plotna
-float _y = 500.0;
-float _kat = -90.0; // -90 stopni -- patrzymy w gore
-
-void _init_svg() {
-    svg_file = fopen("wynik.svg", "w");
-    fprintf(svg_file, "<svg width=\\"1000\\" height=\\"1000\\" xmlns=\\"http://www.w3.org/2000/svg\\">\\n"); //poczatek svg z deklaracja przestrzeni nazw
-    fprintf(svg_file, "<rect width=\\"100%%\\" height=\\"100%%\\" fill=\\"#f0f0f0\\"/>\\n"); // jasnoszare tlo
-}
-
-void _zapisz_svg() {
-    fprintf(svg_file, "</svg>\\n");
-    fclose(svg_file);
-    printf("[Zolw] Misja zakonczona. Wygenerowano plik wynik.svg!\\n");
-}
-
-void _naprzod(float dystans) {
-    float rad = _kat * (3.14159265 / 180.0);
-    float new_x = _x + dystans * cos(rad);
-    float new_y = _y + dystans * sin(rad);
-
-    // rysujemy linie w svg
-    fprintf(svg_file, "<line x1=\\"%.2f\\" y1=\\"%.2f\\" x2=\\"%.2f\\" y2=\\"%.2f\\" stroke=\\"#2c3e50\\" stroke-width=\\"3\\" stroke-linecap=\\"round\\" />\\n", _x, _y, new_x, new_y);
-
-    // aktualizujemy pozycje
-    _x = new_x;
-    _y = new_y;
-}
-
-void _obroc(float zmiana_kata) {
-    _kat += zmiana_kata;
-}
-"""
-
+class TabelaSymboli:
+    def __init__(self):
+        # stos slownikow do obslugi zasiegow
+        self.stos_zasiegow = [{}]
 
 class KompilatorVisitor(SigmaScriptVisitor):
     def __init__(self):
