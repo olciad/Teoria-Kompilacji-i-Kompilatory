@@ -264,7 +264,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
             else:
                 # weryfikacja liczby argumentow
                 podane_argumenty = len(ctx.argumenty().wyrazenie_ogolne()) if ctx.argumenty() else 0
-                oczekiwane_argumenty = self.zadeklarowane_funkcje[nazwa_funkcji]
+                oczekiwane_argumenty = self.zadeklarowane_funkcje[nazwa_funkcji]['parametry']
                 if podane_argumenty != oczekiwane_argumenty:
                     blad = f"[!] Błąd logiczny: Funkcja '{nazwa_funkcji}' oczekuje {oczekiwane_argumenty} argumentów, a podano {podane_argumenty}!"
                     if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
@@ -306,6 +306,13 @@ class KompilatorVisitor(SigmaScriptVisitor):
             czlon = odw.split('.')
             if czlon[0] in ['prawda', 'falsz', 'oraz', 'lub', 'nie']:
                 continue
+
+            #weryfikacja czy to wywolanie funkcji
+            if czlon[0] in self.zadeklarowane_funkcje:
+                typ_zwracany = self.zadeklarowane_funkcje[czlon[0]]['typ_zwracany']
+                if typ_zwracany == 'rzeczywista': return 'rzeczywista'
+                if typ_zwracany == 'tekst': return 'tekst'
+                return 'calkowita'
 
             typ = self.symbole.pobierz_typ_zmiennej(czlon[0])
 
@@ -379,7 +386,10 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
         # rejestrujemy funkcje wraz z liczba jej parametrow
         liczba_parametrow = len(ctx.parametry().parametr()) if ctx.parametry() else 0
-        self.zadeklarowane_funkcje[nazwa_funkcji] = liczba_parametrow
+        self.zadeklarowane_funkcje[nazwa_funkcji] = {
+            'parametry': liczba_parametrow,
+            'typ_zwracany': typ_zwracany
+        }
 
         parametry_c = []
         if ctx.parametry():
@@ -408,11 +418,21 @@ class KompilatorVisitor(SigmaScriptVisitor):
         return None
 
     def visitInstrukcja_zwrotu(self, ctx: SigmaScriptParser.Instrukcja_zwrotuContext):
-        if ctx.wyrazenie_ogolne():
-            wartosc = self.tlumacz_wyrazenie(ctx.wyrazenie_ogolne())
-            self.dodaj_kod(f"    return {wartosc};")
+        wartosc = self.tlumacz_wyrazenie(ctx.wyrazenie_ogolne()) if ctx.wyrazenie_ogolne() else ""
+
+        if not self.w_funkcji:
+            # jestesmy w programie glownym wiec zapisujemy plik svg przed wyjsciem
+            self.dodaj_kod("    _zapisz_svg();")
+            if wartosc:
+                self.dodaj_kod(f"    return {wartosc};")
+            else:
+                self.dodaj_kod("    return 0;")
         else:
-            self.dodaj_kod("    return;")
+            # standardowy return z wnetrza funkcji
+            if wartosc:
+                self.dodaj_kod(f"    return {wartosc};")
+            else:
+                self.dodaj_kod("    return;")
         return None
 
     def visitWywolanie_funkcji(self, ctx: SigmaScriptParser.Wywolanie_funkcjiContext):
@@ -446,8 +466,10 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
         print(f"[Kompilator] Deklaracja zmiennej: {nazwa} ({typ_c})")
 
-        # jesli jestesmy poza funkcjami (globalnie)
-        if not self.w_funkcji:
+        # sprawdzamy czy jestesmy globalnie
+        jest_globalnie = (len(self.symbole.stos_zasiegow) == 1)
+
+        if jest_globalnie:
             # tablice inicjalizujemy globalnie
             if wartosc_c and wartosc_c.startswith(" = {"):
                 self.kod_globalny.append(f"{typ_c} {nazwa}{wymiar}{wartosc_c};")
@@ -457,7 +479,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
                 if wartosc_c:
                     self.kod_main.append(f"    {nazwa}{wartosc_c};")
         else:
-            #wewnatrz funkcji deklarujemy standardowo
+            # w funkcjach, petlach i warunkach deklarujemy zmienne standardowo
             self.dodaj_kod(f"    {typ_c} {nazwa}{wymiar}{wartosc_c};")
 
         return None
