@@ -177,7 +177,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
         # tabela symboli, rejestr struktur, rejestr funkcji i tablica bledow semantycznych
         self.symbole = TabelaSymboli()
         self.definicje_struktur = {}
-        self.zadeklarowane_funkcje = []
+        self.zadeklarowane_funkcje = {}
         self.bledy_semantyczne = []
 
     def dodaj_kod(self, linia):
@@ -185,6 +185,22 @@ class KompilatorVisitor(SigmaScriptVisitor):
             self.kod_globalny.append(linia)
         else:
             self.kod_main.append(linia)
+
+    def rozpoznawanie_typow(self, typ_bazowy):
+        """Mapuje typy z języka SigmaScript na odpowiedniki w języku C."""
+        if typ_bazowy == "calkowita":
+            return "int"
+        elif typ_bazowy == "rzeczywista":
+            return "float"
+        elif typ_bazowy == "logiczna":
+            return "int"
+        elif typ_bazowy == "tekst":
+            return "char*"
+        elif typ_bazowy == "pusta":
+            return "void"
+        else:
+            # zwracamy oryginalna nazwe dla obiektow struktur
+            return typ_bazowy
 
     # weryfikacja odwolan do pol struktur
     def weryfikuj_odwolanie(self, ctx: SigmaScriptParser.OdwolanieContext):
@@ -240,10 +256,18 @@ class KompilatorVisitor(SigmaScriptVisitor):
         # weryfikacja czy wywolywana funkcja istnieje
         if isinstance(ctx, SigmaScriptParser.Wywolanie_funkcjiContext):
             nazwa_funkcji = ctx.IDENT().getText()
+
+            # weryfikacja z uzyciem slownika
             if nazwa_funkcji not in self.zadeklarowane_funkcje:
                 blad = f"[!] Błąd logiczny: Próba wywołania nieznanej funkcji '{nazwa_funkcji}'!"
-                if blad not in self.bledy_semantyczne:
-                    self.bledy_semantyczne.append(blad)
+                if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+            else:
+                # weryfikacja liczby argumentow
+                podane_argumenty = len(ctx.argumenty().wyrazenie_ogolne()) if ctx.argumenty() else 0
+                oczekiwane_argumenty = self.zadeklarowane_funkcje[nazwa_funkcji]
+                if podane_argumenty != oczekiwane_argumenty:
+                    blad = f"[!] Błąd logiczny: Funkcja '{nazwa_funkcji}' oczekuje {oczekiwane_argumenty} argumentów, a podano {podane_argumenty}!"
+                    if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
 
         # weryfikacja wywolan pol uzywanych w wyrazeniach
         if isinstance(ctx, SigmaScriptParser.OdwolanieContext):
@@ -273,8 +297,11 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
         tekst_surowy = ctx.getText()
 
-        # wyszukujemy nazwy zmiennych
-        odwolania = re.findall(r'[a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*)*', tekst_surowy)
+        # usuwamy indeksy tablicy z analizowanego tekstu
+        tekst_bez_indeksow = re.sub(r'\[.*?\]', '', tekst_surowy)
+
+        # szukamy po wyczyszczonym tekscie
+        odwolania = re.findall(r'[a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*)*', tekst_bez_indeksow)
         for odw in odwolania:
             czlon = odw.split('.')
             if czlon[0] in ['prawda', 'falsz', 'oraz', 'lub', 'nie']:
@@ -333,16 +360,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
             # rejestrujemy pole w naszym rejestrze struktur
             self.definicje_struktur[nazwa_struktury][nazwa_pola] = typ_bazowy
 
-            if "calkowita" in typ_bazowy:
-                typ_c = "int"
-            elif "rzeczywista" in typ_bazowy:
-                typ_c = "float"
-            elif "logiczna" in typ_bazowy:
-                typ_c = "int"
-            elif "tekst" in typ_bazowy:
-                typ_c = "char*"
-            else:
-                typ_c = typ_bazowy  # pozwala nawet na struktury w strukturach
+            typ_c = self.rozpoznawanie_typow(typ_bazowy)
 
             self.dodaj_kod(f"    {typ_c} {nazwa_pola}{wymiar};")
 
@@ -353,22 +371,15 @@ class KompilatorVisitor(SigmaScriptVisitor):
     # FUNKCJE
     def visitDefinicja_funkcji(self, ctx: SigmaScriptParser.Definicja_funkcjiContext):
         typ_zwracany = ctx.typ_zwracany().getText()
-        if "calkowita" in typ_zwracany:
-            typ_c = "int"
-        elif "rzeczywista" in typ_zwracany:
-            typ_c = "float"
-        elif "logiczna" in typ_zwracany:
-            typ_c = "int"
-        elif "pusta" in typ_zwracany:
-            typ_c = "void"
-        elif "tekst" in typ_zwracany:
-            typ_c = "char*"
-        else:
-            typ_c = typ_zwracany  # zwracanie obiektow struktur
+
+        typ_c = self.rozpoznawanie_typow(typ_zwracany)
 
         nazwa_funkcji = ctx.IDENT().getText()
         print(f"[Kompilator] Deklaracja funkcji: {nazwa_funkcji}")
-        self.zadeklarowane_funkcje.append(nazwa_funkcji)
+
+        # rejestrujemy funkcje wraz z liczba jej parametrow
+        liczba_parametrow = len(ctx.parametry().parametr()) if ctx.parametry() else 0
+        self.zadeklarowane_funkcje[nazwa_funkcji] = liczba_parametrow
 
         parametry_c = []
         if ctx.parametry():
@@ -376,16 +387,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
                 typ_param_sigma = param.typ().getChild(0).getText()
                 wymiar = param.typ().wymiar_tablicy().getText() if param.typ().wymiar_tablicy() else ""
 
-                if "calkowita" in typ_param_sigma:
-                    p_typ = "int"
-                elif "rzeczywista" in typ_param_sigma:
-                    p_typ = "float"
-                elif "logiczna" in typ_param_sigma:
-                    p_typ = "int"
-                elif "tekst" in typ_param_sigma:
-                    p_typ = "char*"
-                else:
-                    p_typ = typ_param_sigma  # parametr typu struktury
+                p_typ = self.rozpoznawanie_typow(typ_param_sigma)
 
                 # typ, nazwa oraz ewentualny wymiar tablicy
                 parametry_c.append(f"{p_typ} {param.IDENT().getText()}{wymiar}")
@@ -432,16 +434,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
             self.bledy_semantyczne.append(blad)
             return None
 
-        if "calkowita" in typ_bazowy:
-            typ_c = "int"
-        elif "rzeczywista" in typ_bazowy:
-            typ_c = "float"
-        elif "logiczna" in typ_bazowy:
-            typ_c = "int"
-        elif "tekst" in typ_bazowy:
-            typ_c = "char*"
-        else:
-            typ_c = typ_bazowy  # obsluga inicjalizacji struktury: Dron moj_dron
+        typ_c = self.rozpoznawanie_typow(typ_bazowy)
 
         wartosc_c = ""
         if ctx.wyrazenie_ogolne():
@@ -486,6 +479,13 @@ class KompilatorVisitor(SigmaScriptVisitor):
         self.weryfikuj_odwolanie(ctx.odwolanie())
 
         wyrazenie_c = self.tlumacz_wyrazenie(ctx.wyrazenie_ogolne())
+
+        # blokada przypisywania calej tablicy po deklaracji
+        if wyrazenie_c.startswith("[") and wyrazenie_c.endswith("]"):
+            blad = f"[!] Błąd logiczny: Nie można przypisać całej nowej tablicy {wyrazenie_c} po deklaracji. Zmieniaj pojedyncze elementy!"
+            if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+            return None
+
         self.dodaj_kod(f"    {pelne_odwolanie} = {wyrazenie_c};")
         return None
 
