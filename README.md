@@ -160,28 +160,32 @@ Gramatyka została zapisana w notacji generatora ANTLR4
 (z pominięciem reguł leksykalnych, które opisano w tabeli powyżej).
 
 ```antlr
+// glowna regula programu - zero lub wiecej definicji (instrukcji, struktur, funkcji)
 program: definicja* EOF ;
 
-// --- ELEMENTY GLOBALNE ---
+// definicja moze byc instrukcja, struktura, lub funkcja
 definicja: instrukcja
          | definicja_struktury
          | definicja_funkcji
          ;
 
+// struktury i funkcje
 definicja_struktury: STRUKTURA IDENT L_KLAMRA deklaracja_zmiennej* P_KLAMRA ;
-
 definicja_funkcji: FUNKCJA typ_zwracany IDENT L_NAWIAS parametry? P_NAWIAS blok_kodu ;
 
+// parametry funkcji
 parametry: parametr (PRZECINEK parametr)* ;
 parametr: typ IDENT ;
 
+// typy
 typ_zwracany: typ | PUSTA ;
 typ: (CALKOWITA | RZECZYWISTA | LOGICZNA | TEKST_TYP | IDENT) wymiar_tablicy? ;
 wymiar_tablicy: L_KWADRAT LICZ_CALK? P_KWADRAT ;
 
+// blok kodu
 blok_kodu: L_KLAMRA instrukcja* P_KLAMRA ;
 
-// --- INSTRUKCJE ---
+// instrukcje
 instrukcja: polecenie_ruchu
           | polecenie_obrotu
           | petla
@@ -194,61 +198,63 @@ instrukcja: polecenie_ruchu
           | wywolanie_funkcji
           ;
 
-polecenie_ruchu: (NAPRZOD | NPRZ) wyrazenie_arytmetyczne ;
-polecenie_obrotu: (OBROC | OBR) wyrazenie_arytmetyczne ;
+// polecenia zolwia
+polecenie_ruchu: NAPRZOD wyrazenie_arytmetyczne ;
+polecenie_obrotu: OBROC wyrazenie_arytmetyczne ;
 
-// Petla for-like (powtorz n razy)
+// petle
 petla: POWTORZ wyrazenie_arytmetyczne blok_kodu ;
-
-// Petla while-like (wymaga wyrazenia logicznego!)
 petla_warunkowa: DOPOKI L_NAWIAS wyrazenie_logiczne P_NAWIAS blok_kodu ;
 
-// Instrukcja if (wymaga wyrazenia logicznego!)
+// instrukcje warunkowe
 instrukcja_warunkowa: JEZELI L_NAWIAS wyrazenie_logiczne P_NAWIAS blok_kodu (INACZEJ blok_kodu)? ;
 
+// inne
 wypisanie: WYPISZ wyrazenie_ogolne ;
-
 deklaracja_zmiennej: typ IDENT (PRZYPIS wyrazenie_ogolne)? ;
 przypisanie: USTAW odwolanie PRZYPIS wyrazenie_ogolne ;
 instrukcja_zwrotu: ZWROC wyrazenie_ogolne? ;
 
-// --- ODWOLANIA I FUNKCJE ---
-// Zmienna, element tablicy lub pole struktury (np. tablica[0].x)
+// odwolanie, pozwala na: tablica[0].wspolrzedna_x
 odwolanie: IDENT (L_KWADRAT wyrazenie_arytmetyczne P_KWADRAT | KROPKA IDENT)* ;
 
+// wywolywanie funkcji
 wywolanie_funkcji: IDENT L_NAWIAS argumenty? P_NAWIAS ;
 argumenty: wyrazenie_ogolne (PRZECINEK wyrazenie_ogolne)* ;
 
-inicjalizacja_tablicy: L_KWADRAT argumenty P_KWADRAT ;
+// inicjalizacja tablicy
+inicjalizacja_tablicy: L_KWADRAT argumenty? P_KWADRAT ;
 
-// --- WYRAZENIA (ROZDZIELENIE LOGIKI I ARYTMETYKI) ---
+// wyrazenie
 wyrazenie_ogolne: wyrazenie_arytmetyczne
                 | wyrazenie_logiczne
                 | TEKST
                 | inicjalizacja_tablicy
                 ;
 
-// Tylko to moze wejsc do instrukcji JEZELI oraz DOPOKI
-wyrazenie_logiczne: wyrazenie_arytmetyczne operator_rel wyrazenie_arytmetyczne
-                  | wyrazenie_logiczne (ORAZ | LUB) wyrazenie_logiczne
-                  | NIE wyrazenie_logiczne
-                  | PRAWDA 
+// wyraznenie logiczne
+wyrazenie_logiczne: L_NAWIAS wyrazenie_logiczne P_NAWIAS
+                  | PRAWDA
                   | FALSZ
-                  | odwolanie          // jesli to zmienna boolowska
-                  | wywolanie_funkcji  // jesli funkcja zwraca bool
-                  | L_NAWIAS wyrazenie_logiczne P_NAWIAS
+                  | wywolanie_funkcji
+                  | odwolanie
+                  | wyrazenie_arytmetyczne operator_rel wyrazenie_arytmetyczne
+                  | wyrazenie_logiczne (ROWNY | ROZNY) wyrazenie_logiczne
+                  | NIE wyrazenie_logiczne
+                  | wyrazenie_logiczne ORAZ wyrazenie_logiczne
+                  | wyrazenie_logiczne LUB wyrazenie_logiczne
                   ;
-
 operator_rel: ROWNY | ROZNY | MNIEJSZY | WIEKSZY | MNIEJ_ROWN | WIEC_ROWN ;
 
-// Tradycyjne operacje matematyczne
-wyrazenie_arytmetyczne: wyrazenie_arytmetyczne (RAZY | PRZEZ) wyrazenie_arytmetyczne
-                      | wyrazenie_arytmetyczne (PLUS | MINUS) wyrazenie_arytmetyczne
+// wyrazenie arytmetyczne
+wyrazenie_arytmetyczne: L_NAWIAS wyrazenie_arytmetyczne P_NAWIAS
+                      | wywolanie_funkcji
+                      | odwolanie
                       | LICZ_CALK
                       | LICZ_RZECZ
-                      | odwolanie          // jesli zmienna to liczba
-                      | wywolanie_funkcji  // jesli funkcja zwraca liczbe
-                      | L_NAWIAS wyrazenie_arytmetyczne P_NAWIAS
+                      | wyrazenie_arytmetyczne (RAZY | PRZEZ) wyrazenie_arytmetyczne
+                      | wyrazenie_arytmetyczne (PLUS | MINUS) wyrazenie_arytmetyczne
+                      | MINUS wyrazenie_arytmetyczne
                       ;
 ```
 # 7. Wymagania wstępne, instalacja i instrukcja obsługi
@@ -301,10 +307,9 @@ Skompilowany program można uruchomić następującym poleceniem na systemach Li
 ./rysownik
 ```
 
+Po wykonaniu programu powinien się wygenerować plik `wynik.svg` z wygenerowanym rysunkiem.
 
 # UWAGI
-
-Po wykonaniu programu powinien się wygenerować plik `wynik.svg` z wygenerowanym rysunkiem.
 
 rozszerzyc obsluge bledow, bledy semantyczne, zamienic komunikaty na polskie (bledy ktore nie sa zwiazane z niezgodnoscia z gramatyka)
 wygodny interfejs
