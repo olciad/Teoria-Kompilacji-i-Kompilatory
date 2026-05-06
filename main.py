@@ -25,7 +25,7 @@ void _init_svg() {
 void _zapisz_svg() {
     fprintf(svg_file, "</svg>\\n");
     fclose(svg_file);
-    printf("[Zolw] Misja zakonczona. Wygenerowano plik wynik.svg!\\n");
+    printf("[+] Misja zakonczona. Wygenerowano plik wynik.svg!\\n");
 }
 
 void _naprzod(float dystans) {
