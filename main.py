@@ -1,8 +1,94 @@
 import sys
+import re
 from antlr4 import *
 from antlr_generated.SigmaScriptLexer import SigmaScriptLexer
 from antlr_generated.SigmaScriptParser import SigmaScriptParser
 from antlr_generated.SigmaScriptVisitor import SigmaScriptVisitor
+from antlr4.error.ErrorListener import ErrorListener
+
+
+class PolskiErrorListener(ErrorListener):
+    def __init__(self):
+        super(PolskiErrorListener, self).__init__()
+        self.bledy = []
+
+    def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
+        # kolory do konsoli
+        KOLOR_CZERWONY = '\033[91m'
+        KOLOR_SZARY = '\033[90m'
+        KOLOR_RESET = '\033[0m'
+
+        znaki_pl = {
+            "'{'": "klamry otwierającej '{'",
+            "'}'": "klamry zamykającej '}'",
+            "'('": "nawiasu otwierającego '('",
+            "')'": "nawiasu zamykającego ')'",
+            "'['": "nawiasu kwadratowego '['",
+            "']'": "nawiasu kwadratowego ']'",
+            "'='": "znaku równości '='",
+            "','": "przecinka ','"
+        }
+
+        polska_wiadomosc = ""
+
+        # zabezpieczenie przed naglym koncem pliku
+        if "at '<EOF>'" in msg or "input '<EOF>'" in msg:
+            # sprawdzamy czy brakuje nawiasu czy co innego
+            if "'}'" in msg:
+                polska_wiadomosc = "Plik skończył się niespodziewanie! Wygląda na to, że gdzieś wcześniej zapomniano zamknąć klamrę '}'."
+            elif "')'" in msg:
+                polska_wiadomosc = "Plik skończył się niespodziewanie! Wygląda na to, że brakuje nawiasu zamykającego ')'."
+            else:
+                polska_wiadomosc = "Kod urywa się nagle. Sprawdź, czy na pewno dokończono ostatnie polecenie."
+
+        # blad tokenu
+        elif msg.startswith("token recognition error"):
+            match = re.search(r"at: '(.*?)'", msg)
+            zly_znak = match.group(1) if match else "nieznany"
+            polska_wiadomosc = f"Użyto znaku '{zly_znak}', którego ten język nie rozumie. Upewnij się, że nie używasz polskich znaków (np. ą, ę)."
+
+        # brakujacy znak
+        elif msg.startswith("missing "):
+            match = re.search(r"missing (.*?) at", msg)
+            if match:
+                brakujacy_znak = match.group(1)
+                przetlumaczony = znaki_pl.get(brakujacy_znak, f"elementu: {brakujacy_znak}")
+                polska_wiadomosc = f"Wygląda na to, że brakuje {przetlumaczony}."
+
+        # niezgodny znak
+        elif msg.startswith("mismatched input "):
+            match = re.search(r"expecting \{(.*?)\}|expecting (.*)", msg)
+            oczekiwane = ""
+            if match:
+                surowe_oczekiwane = match.group(1) if match.group(1) else match.group(2)
+                for znak_ang, znak_pol in znaki_pl.items():
+                    if znak_ang in surowe_oczekiwane:
+                        oczekiwane = znak_pol
+                        break
+            if oczekiwane:
+                polska_wiadomosc = f"Użyto niewłaściwego znaku. W tym miejscu spodziewano się {oczekiwane}."
+            else:
+                polska_wiadomosc = "Użyto niewłaściwego słowa lub znaku. Sprawdź, czy polecenie jest poprawnie napisane."
+
+        # nadmiarowy znak
+        elif msg.startswith("extraneous input "):
+            polska_wiadomosc = "Ten znak lub słowo wydaje się tu niepotrzebne. Spróbuj je usunąć."
+
+        # brak alternatywy
+        elif msg.startswith("no viable alternative"):
+            polska_wiadomosc = "Kompletnie nie rozumiem tego polecenia. Upewnij się, że zaczyna się od znanej instrukcji (np. ustaw, wypisz, jezeli)."
+
+        else:
+            polska_wiadomosc = "Coś poszło nie tak ze składnią, ale ciężko mi określić dokładnie co."
+
+        #kolorowana wiadomosc
+        blad = (
+            f"{KOLOR_CZERWONY}Ups! Błąd w linii {line}, znak {column}: {polska_wiadomosc}{KOLOR_RESET}\n"
+            f"{KOLOR_SZARY}   (Szczegóły dla zaawansowanych: {msg}){KOLOR_RESET}\n"
+        )
+
+        self.bledy.append(blad)
+        print(blad)
 
 # biblioteka runtime
 RUNTIME_C = """#include <stdio.h>
@@ -238,10 +324,24 @@ def main():
 
     plik_wejsciowy = sys.argv[1]
     input_stream = FileStream(plik_wejsciowy, encoding='utf-8')
+
+    error_listener = PolskiErrorListener()
+
     lexer = SigmaScriptLexer(input_stream)
+    lexer.removeErrorListeners()
+    lexer.addErrorListener(error_listener)
+
     stream = CommonTokenStream(lexer)
     parser = SigmaScriptParser(stream)
+
+    parser.removeErrorListeners()
+    parser.addErrorListener(error_listener)
+
     tree = parser.program()
+
+    if len(error_listener.bledy) > 0:
+        print("\n[!] Kompilacja przerwana z powodu błędów w kodzie.")
+        return
 
     visitor = KompilatorVisitor()
     gotowy_kod_c = visitor.visit(tree)
