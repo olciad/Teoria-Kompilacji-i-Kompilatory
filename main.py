@@ -57,7 +57,7 @@ class PolskiErrorListener(ErrorListener):
 
         # niezgodny znak
         elif msg.startswith("mismatched input "):
-            match = re.search(r"expecting \{(.*?)\}|expecting (.*)", msg)
+            match = re.search(r"expecting \{(.*?)}|expecting (.*)", msg)
             oczekiwane = ""
             if match:
                 surowe_oczekiwane = match.group(1) if match.group(1) else match.group(2)
@@ -135,6 +135,11 @@ class KompilatorVisitor(SigmaScriptVisitor):
         self.kod_globalny = [] #na funkcje i struktury
         self.kod_main = [] #na cala reszte
         self.w_funkcji = False
+
+        #tabela symboli i bledy semantyczne
+        self.zadeklarowane_zmienne = set()
+        self.zadeklarowane_struktury = set()
+        self.bledy_semantyczne = []
 
     def dodaj_kod(self, linia):
         if self.w_funkcji:
@@ -242,6 +247,15 @@ class KompilatorVisitor(SigmaScriptVisitor):
         wymiar = ctx.typ().wymiar_tablicy().getText() if ctx.typ().wymiar_tablicy() else ""
         nazwa = ctx.IDENT().getText()
 
+        # sprawdzenie czy zmienna juz istnieje
+        if nazwa in self.zadeklarowane_zmienne:
+            blad = f"Błąd logiczny: Zmienna o nazwie '{nazwa}' została już wcześniej stworzona!"
+            print(blad)
+            self.bledy_semantyczne.append(blad)
+            return None  # przerywamy przetwarzanie tej zmiennej
+
+        self.zadeklarowane_zmienne.add(nazwa)
+
         if "calkowita" in typ_bazowy:
             typ_c = "int"
         elif "rzeczywista" in typ_bazowy:
@@ -249,7 +263,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
         elif "logiczna" in typ_bazowy:
             typ_c = "int"
         else:
-            typ_c = typ_bazowy  # Obsługa inicjalizacji struktury: Dron moj_dron
+            typ_c = typ_bazowy  # obsluga inicjalizacji struktury: Dron moj_dron
 
         wartosc_c = ""
         if ctx.wyrazenie_ogolne():
@@ -264,8 +278,20 @@ class KompilatorVisitor(SigmaScriptVisitor):
         return None
 
     def visitPrzypisanie(self, ctx: SigmaScriptParser.PrzypisanieContext):
-        self.dodaj_kod(
-            f"    {ctx.odwolanie().getText()} = {ctx.wyrazenie_ogolne().getText().replace('prawda', '1').replace('falsz', '0')};")
+        pelne_odwolanie = ctx.odwolanie().getText()
+
+        glowna_zmienna = ctx.odwolanie().IDENT(0).getText()
+
+        #sprawdzamy czy zmienna istnieje
+        if glowna_zmienna not in self.zadeklarowane_zmienne:
+            blad = f"Błąd logiczny: Próbujesz zmienić wartość '{glowna_zmienna}', ale taka zmienna nie została zadeklarowana!"
+            print(blad)
+            self.bledy_semantyczne.append(blad)
+            return None
+
+        # jesli wszystko ok - generujemy kod w C
+        wyrazenie_c = ctx.wyrazenie_ogolne().getText().replace('prawda', '1').replace('falsz', '0')
+        self.dodaj_kod(f"    {pelne_odwolanie} = {wyrazenie_c};")
         return None
 
     # STEROWANIE I LOGIKA
@@ -340,11 +366,15 @@ def main():
     tree = parser.program()
 
     if len(error_listener.bledy) > 0:
-        print("\n[!] Kompilacja przerwana z powodu błędów w kodzie.")
+        print("\n[!] Znalazłem błędy w Twoim kodzie. Popraw je, aby przejść dalej!")
         return
 
     visitor = KompilatorVisitor()
     gotowy_kod_c = visitor.visit(tree)
+
+    if len(visitor.bledy_semantyczne) > 0:
+        print("\n[!] Znalazłem błędy logiczne w Twoim kodzie. Popraw je, aby przejść dalej!")
+        return
 
     with open("wynik.c", "w", encoding='utf-8') as f:
         f.write(gotowy_kod_c)
