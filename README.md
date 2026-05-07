@@ -236,6 +236,7 @@ wyrazenie_ogolne: wyrazenie_arytmetyczne
 wyrazenie_logiczne: L_NAWIAS wyrazenie_logiczne P_NAWIAS
                   | PRAWDA
                   | FALSZ
+                  | TEKST
                   | wywolanie_funkcji
                   | odwolanie
                   | wyrazenie_arytmetyczne operator_rel wyrazenie_arytmetyczne

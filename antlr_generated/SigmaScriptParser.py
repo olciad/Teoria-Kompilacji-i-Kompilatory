@@ -10,7 +10,7 @@ else:
 
 def serializedATN():
     return [
-        4,1,46,276,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
+        4,1,46,277,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
         6,2,7,7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,
         2,14,7,14,2,15,7,15,2,16,7,16,2,17,7,17,2,18,7,18,2,19,7,19,2,20,
         7,20,2,21,7,21,2,22,7,22,2,23,7,23,2,24,7,24,2,25,7,25,2,26,7,26,
@@ -28,19 +28,19 @@ def serializedATN():
         3,21,195,8,21,1,21,1,21,1,22,1,22,1,22,5,22,202,8,22,10,22,12,22,
         205,9,22,1,23,1,23,3,23,209,8,23,1,23,1,23,1,24,1,24,1,24,1,24,3,
         24,217,8,24,1,25,1,25,1,25,1,25,1,25,1,25,1,25,1,25,1,25,1,25,1,
-        25,1,25,1,25,1,25,1,25,3,25,234,8,25,1,25,1,25,1,25,1,25,1,25,1,
-        25,1,25,1,25,1,25,5,25,245,8,25,10,25,12,25,248,9,25,1,26,1,26,1,
-        27,1,27,1,27,1,27,1,27,1,27,1,27,1,27,1,27,1,27,1,27,3,27,263,8,
-        27,1,27,1,27,1,27,1,27,1,27,1,27,5,27,271,8,27,10,27,12,27,274,9,
-        27,1,27,0,2,50,54,28,0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,
+        25,1,25,1,25,1,25,1,25,1,25,3,25,235,8,25,1,25,1,25,1,25,1,25,1,
+        25,1,25,1,25,1,25,1,25,5,25,246,8,25,10,25,12,25,249,9,25,1,26,1,
+        26,1,27,1,27,1,27,1,27,1,27,1,27,1,27,1,27,1,27,1,27,1,27,3,27,264,
+        8,27,1,27,1,27,1,27,1,27,1,27,1,27,5,27,272,8,27,10,27,12,27,275,
+        9,27,1,27,0,2,50,54,28,0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,
         32,34,36,38,40,42,44,46,48,50,52,54,0,5,2,0,1,4,43,43,1,0,27,28,
-        1,0,27,32,1,0,24,25,1,0,22,23,293,0,59,1,0,0,0,2,67,1,0,0,0,4,69,
+        1,0,27,32,1,0,24,25,1,0,22,23,295,0,59,1,0,0,0,2,67,1,0,0,0,4,69,
         1,0,0,0,6,80,1,0,0,0,8,90,1,0,0,0,10,98,1,0,0,0,12,103,1,0,0,0,14,
         105,1,0,0,0,16,109,1,0,0,0,18,115,1,0,0,0,20,134,1,0,0,0,22,136,
         1,0,0,0,24,139,1,0,0,0,26,142,1,0,0,0,28,146,1,0,0,0,30,152,1,0,
         0,0,32,161,1,0,0,0,34,164,1,0,0,0,36,170,1,0,0,0,38,175,1,0,0,0,
         40,179,1,0,0,0,42,191,1,0,0,0,44,198,1,0,0,0,46,206,1,0,0,0,48,216,
-        1,0,0,0,50,233,1,0,0,0,52,249,1,0,0,0,54,262,1,0,0,0,56,58,3,2,1,
+        1,0,0,0,50,234,1,0,0,0,52,250,1,0,0,0,54,263,1,0,0,0,56,58,3,2,1,
         0,57,56,1,0,0,0,58,61,1,0,0,0,59,57,1,0,0,0,59,60,1,0,0,0,60,62,
         1,0,0,0,61,59,1,0,0,0,62,63,5,0,0,1,63,1,1,0,0,0,64,68,3,20,10,0,
         65,68,3,4,2,0,66,68,3,6,3,0,67,64,1,0,0,0,67,65,1,0,0,0,67,66,1,
@@ -89,25 +89,26 @@ def serializedATN():
         3,50,25,0,214,217,5,44,0,0,215,217,3,46,23,0,216,212,1,0,0,0,216,
         213,1,0,0,0,216,214,1,0,0,0,216,215,1,0,0,0,217,49,1,0,0,0,218,219,
         6,25,-1,0,219,220,5,33,0,0,220,221,3,50,25,0,221,222,5,34,0,0,222,
-        234,1,0,0,0,223,234,5,9,0,0,224,234,5,10,0,0,225,234,3,42,21,0,226,
-        234,3,40,20,0,227,228,3,54,27,0,228,229,3,52,26,0,229,230,3,54,27,
-        0,230,234,1,0,0,0,231,232,5,21,0,0,232,234,3,50,25,3,233,218,1,0,
-        0,0,233,223,1,0,0,0,233,224,1,0,0,0,233,225,1,0,0,0,233,226,1,0,
-        0,0,233,227,1,0,0,0,233,231,1,0,0,0,234,246,1,0,0,0,235,236,10,4,
-        0,0,236,237,7,1,0,0,237,245,3,50,25,5,238,239,10,2,0,0,239,240,5,
-        19,0,0,240,245,3,50,25,3,241,242,10,1,0,0,242,243,5,20,0,0,243,245,
-        3,50,25,2,244,235,1,0,0,0,244,238,1,0,0,0,244,241,1,0,0,0,245,248,
-        1,0,0,0,246,244,1,0,0,0,246,247,1,0,0,0,247,51,1,0,0,0,248,246,1,
-        0,0,0,249,250,7,2,0,0,250,53,1,0,0,0,251,252,6,27,-1,0,252,253,5,
-        33,0,0,253,254,3,54,27,0,254,255,5,34,0,0,255,263,1,0,0,0,256,263,
-        3,42,21,0,257,263,3,40,20,0,258,263,5,41,0,0,259,263,5,42,0,0,260,
-        261,5,23,0,0,261,263,3,54,27,1,262,251,1,0,0,0,262,256,1,0,0,0,262,
-        257,1,0,0,0,262,258,1,0,0,0,262,259,1,0,0,0,262,260,1,0,0,0,263,
-        272,1,0,0,0,264,265,10,3,0,0,265,266,7,3,0,0,266,271,3,54,27,4,267,
-        268,10,2,0,0,268,269,7,4,0,0,269,271,3,54,27,3,270,264,1,0,0,0,270,
-        267,1,0,0,0,271,274,1,0,0,0,272,270,1,0,0,0,272,273,1,0,0,0,273,
-        55,1,0,0,0,274,272,1,0,0,0,25,59,67,75,85,95,103,107,111,119,134,
-        159,168,177,186,188,194,203,208,216,233,244,246,262,270,272
+        235,1,0,0,0,223,235,5,9,0,0,224,235,5,10,0,0,225,235,5,44,0,0,226,
+        235,3,42,21,0,227,235,3,40,20,0,228,229,3,54,27,0,229,230,3,52,26,
+        0,230,231,3,54,27,0,231,235,1,0,0,0,232,233,5,21,0,0,233,235,3,50,
+        25,3,234,218,1,0,0,0,234,223,1,0,0,0,234,224,1,0,0,0,234,225,1,0,
+        0,0,234,226,1,0,0,0,234,227,1,0,0,0,234,228,1,0,0,0,234,232,1,0,
+        0,0,235,247,1,0,0,0,236,237,10,4,0,0,237,238,7,1,0,0,238,246,3,50,
+        25,5,239,240,10,2,0,0,240,241,5,19,0,0,241,246,3,50,25,3,242,243,
+        10,1,0,0,243,244,5,20,0,0,244,246,3,50,25,2,245,236,1,0,0,0,245,
+        239,1,0,0,0,245,242,1,0,0,0,246,249,1,0,0,0,247,245,1,0,0,0,247,
+        248,1,0,0,0,248,51,1,0,0,0,249,247,1,0,0,0,250,251,7,2,0,0,251,53,
+        1,0,0,0,252,253,6,27,-1,0,253,254,5,33,0,0,254,255,3,54,27,0,255,
+        256,5,34,0,0,256,264,1,0,0,0,257,264,3,42,21,0,258,264,3,40,20,0,
+        259,264,5,41,0,0,260,264,5,42,0,0,261,262,5,23,0,0,262,264,3,54,
+        27,1,263,252,1,0,0,0,263,257,1,0,0,0,263,258,1,0,0,0,263,259,1,0,
+        0,0,263,260,1,0,0,0,263,261,1,0,0,0,264,273,1,0,0,0,265,266,10,3,
+        0,0,266,267,7,3,0,0,267,272,3,54,27,4,268,269,10,2,0,0,269,270,7,
+        4,0,0,270,272,3,54,27,3,271,265,1,0,0,0,271,268,1,0,0,0,272,275,
+        1,0,0,0,273,271,1,0,0,0,273,274,1,0,0,0,274,55,1,0,0,0,275,273,1,
+        0,0,0,25,59,67,75,85,95,103,107,111,119,134,159,168,177,186,188,
+        194,203,208,216,234,245,247,263,271,273
     ]
 
 class SigmaScriptParser ( Parser ):
@@ -2069,6 +2070,9 @@ class SigmaScriptParser ( Parser ):
         def FALSZ(self):
             return self.getToken(SigmaScriptParser.FALSZ, 0)
 
+        def TEKST(self):
+            return self.getToken(SigmaScriptParser.TEKST, 0)
+
         def wywolanie_funkcji(self):
             return self.getTypedRuleContext(SigmaScriptParser.Wywolanie_funkcjiContext,0)
 
@@ -2132,7 +2136,7 @@ class SigmaScriptParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 233
+            self.state = 234
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input,19,self._ctx)
             if la_ == 1:
@@ -2156,33 +2160,38 @@ class SigmaScriptParser ( Parser ):
 
             elif la_ == 4:
                 self.state = 225
-                self.wywolanie_funkcji()
+                self.match(SigmaScriptParser.TEKST)
                 pass
 
             elif la_ == 5:
                 self.state = 226
-                self.odwolanie()
+                self.wywolanie_funkcji()
                 pass
 
             elif la_ == 6:
                 self.state = 227
-                self.wyrazenie_arytmetyczne(0)
-                self.state = 228
-                self.operator_rel()
-                self.state = 229
-                self.wyrazenie_arytmetyczne(0)
+                self.odwolanie()
                 pass
 
             elif la_ == 7:
-                self.state = 231
-                self.match(SigmaScriptParser.NIE)
+                self.state = 228
+                self.wyrazenie_arytmetyczne(0)
+                self.state = 229
+                self.operator_rel()
+                self.state = 230
+                self.wyrazenie_arytmetyczne(0)
+                pass
+
+            elif la_ == 8:
                 self.state = 232
+                self.match(SigmaScriptParser.NIE)
+                self.state = 233
                 self.wyrazenie_logiczne(3)
                 pass
 
 
             self._ctx.stop = self._input.LT(-1)
-            self.state = 246
+            self.state = 247
             self._errHandler.sync(self)
             _alt = self._interp.adaptivePredict(self._input,21,self._ctx)
             while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
@@ -2190,55 +2199,55 @@ class SigmaScriptParser ( Parser ):
                     if self._parseListeners is not None:
                         self.triggerExitRuleEvent()
                     _prevctx = localctx
-                    self.state = 244
+                    self.state = 245
                     self._errHandler.sync(self)
                     la_ = self._interp.adaptivePredict(self._input,20,self._ctx)
                     if la_ == 1:
                         localctx = SigmaScriptParser.Wyrazenie_logiczneContext(self, _parentctx, _parentState)
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_wyrazenie_logiczne)
-                        self.state = 235
+                        self.state = 236
                         if not self.precpred(self._ctx, 4):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 4)")
-                        self.state = 236
+                        self.state = 237
                         _la = self._input.LA(1)
                         if not(_la==27 or _la==28):
                             self._errHandler.recoverInline(self)
                         else:
                             self._errHandler.reportMatch(self)
                             self.consume()
-                        self.state = 237
+                        self.state = 238
                         self.wyrazenie_logiczne(5)
                         pass
 
                     elif la_ == 2:
                         localctx = SigmaScriptParser.Wyrazenie_logiczneContext(self, _parentctx, _parentState)
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_wyrazenie_logiczne)
-                        self.state = 238
+                        self.state = 239
                         if not self.precpred(self._ctx, 2):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 2)")
-                        self.state = 239
-                        self.match(SigmaScriptParser.ORAZ)
                         self.state = 240
+                        self.match(SigmaScriptParser.ORAZ)
+                        self.state = 241
                         self.wyrazenie_logiczne(3)
                         pass
 
                     elif la_ == 3:
                         localctx = SigmaScriptParser.Wyrazenie_logiczneContext(self, _parentctx, _parentState)
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_wyrazenie_logiczne)
-                        self.state = 241
+                        self.state = 242
                         if not self.precpred(self._ctx, 1):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 1)")
-                        self.state = 242
-                        self.match(SigmaScriptParser.LUB)
                         self.state = 243
+                        self.match(SigmaScriptParser.LUB)
+                        self.state = 244
                         self.wyrazenie_logiczne(2)
                         pass
 
              
-                self.state = 248
+                self.state = 249
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,21,self._ctx)
 
@@ -2303,7 +2312,7 @@ class SigmaScriptParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 249
+            self.state = 250
             _la = self._input.LA(1)
             if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 8455716864) != 0)):
                 self._errHandler.recoverInline(self)
@@ -2394,48 +2403,48 @@ class SigmaScriptParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 262
+            self.state = 263
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input,22,self._ctx)
             if la_ == 1:
-                self.state = 252
-                self.match(SigmaScriptParser.L_NAWIAS)
                 self.state = 253
-                self.wyrazenie_arytmetyczne(0)
+                self.match(SigmaScriptParser.L_NAWIAS)
                 self.state = 254
+                self.wyrazenie_arytmetyczne(0)
+                self.state = 255
                 self.match(SigmaScriptParser.P_NAWIAS)
                 pass
 
             elif la_ == 2:
-                self.state = 256
+                self.state = 257
                 self.wywolanie_funkcji()
                 pass
 
             elif la_ == 3:
-                self.state = 257
+                self.state = 258
                 self.odwolanie()
                 pass
 
             elif la_ == 4:
-                self.state = 258
+                self.state = 259
                 self.match(SigmaScriptParser.LICZ_CALK)
                 pass
 
             elif la_ == 5:
-                self.state = 259
+                self.state = 260
                 self.match(SigmaScriptParser.LICZ_RZECZ)
                 pass
 
             elif la_ == 6:
-                self.state = 260
-                self.match(SigmaScriptParser.MINUS)
                 self.state = 261
+                self.match(SigmaScriptParser.MINUS)
+                self.state = 262
                 self.wyrazenie_arytmetyczne(1)
                 pass
 
 
             self._ctx.stop = self._input.LT(-1)
-            self.state = 272
+            self.state = 273
             self._errHandler.sync(self)
             _alt = self._interp.adaptivePredict(self._input,24,self._ctx)
             while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
@@ -2443,47 +2452,47 @@ class SigmaScriptParser ( Parser ):
                     if self._parseListeners is not None:
                         self.triggerExitRuleEvent()
                     _prevctx = localctx
-                    self.state = 270
+                    self.state = 271
                     self._errHandler.sync(self)
                     la_ = self._interp.adaptivePredict(self._input,23,self._ctx)
                     if la_ == 1:
                         localctx = SigmaScriptParser.Wyrazenie_arytmetyczneContext(self, _parentctx, _parentState)
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_wyrazenie_arytmetyczne)
-                        self.state = 264
+                        self.state = 265
                         if not self.precpred(self._ctx, 3):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 3)")
-                        self.state = 265
+                        self.state = 266
                         _la = self._input.LA(1)
                         if not(_la==24 or _la==25):
                             self._errHandler.recoverInline(self)
                         else:
                             self._errHandler.reportMatch(self)
                             self.consume()
-                        self.state = 266
+                        self.state = 267
                         self.wyrazenie_arytmetyczne(4)
                         pass
 
                     elif la_ == 2:
                         localctx = SigmaScriptParser.Wyrazenie_arytmetyczneContext(self, _parentctx, _parentState)
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_wyrazenie_arytmetyczne)
-                        self.state = 267
+                        self.state = 268
                         if not self.precpred(self._ctx, 2):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 2)")
-                        self.state = 268
+                        self.state = 269
                         _la = self._input.LA(1)
                         if not(_la==22 or _la==23):
                             self._errHandler.recoverInline(self)
                         else:
                             self._errHandler.reportMatch(self)
                             self.consume()
-                        self.state = 269
+                        self.state = 270
                         self.wyrazenie_arytmetyczne(3)
                         pass
 
              
-                self.state = 274
+                self.state = 275
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,24,self._ctx)
 
