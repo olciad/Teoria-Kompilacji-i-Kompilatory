@@ -319,11 +319,25 @@ class KompilatorVisitor(SigmaScriptVisitor):
                 if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
             else:
                 # weryfikacja liczby argumentow
-                podane_argumenty = len(ctx.argumenty().wyrazenie_ogolne()) if ctx.argumenty() else 0
+                lista_argumentow = ctx.argumenty().wyrazenie_ogolne() if ctx.argumenty() else []
+                podane_argumenty = len(lista_argumentow)
                 oczekiwane_argumenty = self.zadeklarowane_funkcje[nazwa_funkcji]['parametry']
                 if podane_argumenty != oczekiwane_argumenty:
                     blad = f"[!] Błąd logiczny: Funkcja '{nazwa_funkcji}' oczekuje {oczekiwane_argumenty} argumentów, a podano {podane_argumenty}!"
                     if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+                else:
+                    # weryfikacja typow argumentow w pętli
+                    oczekiwane_typy = self.zadeklarowane_funkcje[nazwa_funkcji]['typy_parametrow']
+
+                    for i in range(podane_argumenty):
+                        # obliczamy typ wyrazenia
+                        podany_typ = self.pobierz_typ_wyrazenia(lista_argumentow[i])
+                        oczekiwany_typ = oczekiwane_typy[i]
+
+                        # sprawdzamy czy typy sie zgadzaja
+                        if podany_typ and oczekiwany_typ and podany_typ != oczekiwany_typ:
+                            blad = f"[!] Błąd logiczny: Niezgodność typów w wywołaniu '{nazwa_funkcji}'. Argument {i + 1} powinien być typu '{oczekiwany_typ}', a jest typu '{podany_typ}'!"
+                            if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
 
         # weryfikacja wywolan pol uzywanych w wyrazeniach
         if isinstance(ctx, SigmaScriptParser.OdwolanieContext):
@@ -372,6 +386,10 @@ class KompilatorVisitor(SigmaScriptVisitor):
         # obliczanie ilosci indeksowan
         liczba_indeksowan = len(ctx.L_KWADRAT())
 
+        # jezeli tablica
+        if czy_tablica and liczba_indeksowan == 0:
+            return f"{obecny_typ}[]"
+
         if liczba_indeksowan > 0:
             if czy_tablica:
                 # zdjety wymiar tablicy
@@ -391,6 +409,10 @@ class KompilatorVisitor(SigmaScriptVisitor):
         # zabezpieczenie przed trafieniem w same liscie
         if isinstance(ctx, TerminalNode):
             return None
+
+        #blokujemy traktowanie calej nowej tablicy jako pojedynczej wartosci
+        if isinstance(ctx, SigmaScriptParser.Inicjalizacja_tablicyContext):
+            return 'tablica'
 
         # konkretne bloki gramatyki - wywolania i odwolania
         if isinstance(ctx, SigmaScriptParser.Wywolanie_funkcjiContext):
@@ -462,9 +484,19 @@ class KompilatorVisitor(SigmaScriptVisitor):
                         f"[!] Błąd logiczny: Nazwa funkcji '{nazwa}' jest już zajęta przez inną strukturę lub funkcję!")
                 else:
                     typ_zwracany = f_ctx.typ_zwracany().getText()
-                    parametry = len(f_ctx.parametry().parametr()) if f_ctx.parametry() else 0
+
+                    # zapisujemy typy parametrow
+                    typy_parametrow = []
+                    if f_ctx.parametry():
+                        for param in f_ctx.parametry().parametr():
+                            bazowy = param.typ().getChild(0).getText()
+                            if param.typ().wymiar_tablicy():
+                                bazowy += "[]"
+                            typy_parametrow.append(bazowy)
+
                     self.zadeklarowane_funkcje[nazwa] = {
-                        'parametry': parametry,
+                        'parametry': len(typy_parametrow),
+                        'typy_parametrow': typy_parametrow,  # zapisana lista typow
                         'typ_zwracany': typ_zwracany
                     }
             # rejestracja struktur
@@ -548,10 +580,18 @@ class KompilatorVisitor(SigmaScriptVisitor):
         nazwa_funkcji = ctx.IDENT().getText()
         print(f"[Kompilator] Deklaracja funkcji: {nazwa_funkcji}")
 
-        # rejestrujemy funkcje wraz z liczba jej parametrow
-        liczba_parametrow = len(ctx.parametry().parametr()) if ctx.parametry() else 0
+        # rejestrujemy funkcje wraz z informacją o parametrach
+        typy_parametrow = []
+        if ctx.parametry():
+            for param in ctx.parametry().parametr():
+                bazowy = param.typ().getChild(0).getText()
+                if param.typ().wymiar_tablicy():
+                    bazowy += "[]"
+                typy_parametrow.append(bazowy)
+
         self.zadeklarowane_funkcje[nazwa_funkcji] = {
-            'parametry': liczba_parametrow,
+            'parametry': len(typy_parametrow),
+            'typy_parametrow': typy_parametrow,
             'typ_zwracany': typ_zwracany
         }
 
