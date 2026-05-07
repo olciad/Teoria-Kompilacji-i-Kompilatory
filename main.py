@@ -13,12 +13,38 @@ RUNTIME_C = """#include <stdio.h>
 #include <math.h>
 #include <string.h>
 
+// garbage collector
+typedef struct StringNode {
+    char* str;
+    struct StringNode* next;
+} StringNode;
+
+StringNode* _string_pool = NULL;
+
+void _rejestruj_tekst(char* str) {
+    StringNode* node = (StringNode*)malloc(sizeof(StringNode));
+    node->str = str;
+    node->next = _string_pool;
+    _string_pool = node;
+}
+
+void _wyczysc_pamiec() {
+    StringNode* current = _string_pool;
+    while (current != NULL) {
+        StringNode* next = current->next;
+        free(current->str);
+        free(current);
+        current = next;
+    }
+}
+
 char* _polacz_teksty(const char* a, const char* b) {
     // alokujemy pamiec na nowy tekst
     char* wynik = (char*)malloc(strlen(a) + strlen(b) + 1);
     if (wynik != NULL) {
         strcpy(wynik, a);
         strcat(wynik, b);
+        _rejestruj_tekst(wynik); // Automatycznie oddajemy pod opieke GC
     }
     return wynik;
 }
@@ -37,6 +63,7 @@ void _init_svg() {
 void _zapisz_svg() {
     fprintf(svg_file, "</svg>\\n");
     fclose(svg_file);
+    _wyczysc_pamiec(); // GC sprzata pamiec z tekstow przed wyjsciem
     printf("[+] Misja zakonczona. Wygenerowano plik wynik.svg!\\n");
 }
 
@@ -199,6 +226,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
         self.definicje_struktur = {}
         self.zadeklarowane_funkcje = {}
         self.bledy_semantyczne = []
+        self.czy_zwrocono_wartosc = False
 
     def dodaj_kod(self, linia):
         if self.w_funkcji:
@@ -542,9 +570,6 @@ class KompilatorVisitor(SigmaScriptVisitor):
         nazwa_struktury = ctx.IDENT().getText()
         print(f"[Kompilator] Definicja struktury: {nazwa_struktury}")
 
-        # tworzymy wpis w slowniku struktur
-        self.definicje_struktur[nazwa_struktury] = {}
-
         # struktury trafiaja na sama gore - uzywamy dedykowanej listy
         self.kod_struktur.append(f"\ntypedef struct {{")
 
@@ -554,14 +579,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
             nazwa_pola = deklaracja.IDENT().getText()
             wymiar = deklaracja.typ().wymiar_tablicy().getText() if deklaracja.typ().wymiar_tablicy() else ""
 
-            # rejestrujemy pole w naszym rejestrze struktur
-            self.definicje_struktur[nazwa_struktury][nazwa_pola] = {
-                'typ_bazowy': typ_bazowy,
-                'czy_tablica': bool(wymiar)
-            }
-
             typ_c = self.rozpoznawanie_typow(typ_bazowy)
-
             self.kod_struktur.append(f"    {typ_c} {nazwa_pola}{wymiar};")
 
         self.kod_struktur.append(f"}} {nazwa_struktury};")
@@ -610,6 +628,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
         self.w_funkcji = True
         self.oczekiwany_typ_zwracany = typ_zwracany
+        self.czy_zwrocono_wartosc = False
 
         self.dodaj_kod(f"\n{typ_c} {nazwa_funkcji}({', '.join(parametry_c)}) {{")
         self.symbole.wejdz_do_bloku()
@@ -621,6 +640,12 @@ class KompilatorVisitor(SigmaScriptVisitor):
                 czy_tablica = param.typ().wymiar_tablicy() is not None
                 self.symbole.dodaj_zmienna(nazwa_param, typ_param_sigma, czy_tablica)
         self.visit(ctx.blok_kodu())
+
+        # Sprawdzamy czy funkcja (inna niz pusta) miala instrukcje zwroc
+        if self.oczekiwany_typ_zwracany != "pusta" and not self.czy_zwrocono_wartosc:
+            blad = f"[!] Błąd logiczny: Funkcja '{nazwa_funkcji}' powinna zwracać typ '{self.oczekiwany_typ_zwracany}', ale brakuje instrukcji 'zwroc'!"
+            if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+
         self.oczekiwany_typ_zwracany = None
         self.symbole.wyjdz_z_bloku()
         self.dodaj_kod("}")
@@ -628,6 +653,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
         return None
 
     def visitInstrukcja_zwrotu(self, ctx: SigmaScriptParser.Instrukcja_zwrotuContext):
+        self.czy_zwrocono_wartosc = True
         wartosc = self.tlumacz_wyrazenie(ctx.wyrazenie_ogolne()) if ctx.wyrazenie_ogolne() else ""
 
         # walidacja typu zwracanego
