@@ -9,8 +9,19 @@ from antlr4.error.ErrorListener import ErrorListener
 
 # biblioteka runtime
 RUNTIME_C = """#include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <string.h>
+
+char* _polacz_teksty(const char* a, const char* b) {
+    // alokujemy pamiec na nowy tekst
+    char* wynik = (char*)malloc(strlen(a) + strlen(b) + 1);
+    if (wynik != NULL) {
+        strcpy(wynik, a);
+        strcat(wynik, b);
+    }
+    return wynik;
+}
 
 FILE *svg_file;
 float _x = 500.0; // poczatek na srodku plotna
@@ -253,7 +264,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
         if ctx is None:
             return ""
 
-        # zabezpieczenie przed dzieleniem przez zero w wyrazeniach
+        # zabezpieczenie przed dzieleniem przez zero w wyrazeniach i konkatenacja tekstow
         if isinstance(ctx, SigmaScriptParser.Wyrazenie_arytmetyczneContext):
             if ctx.PRZEZ():
                 # tlumaczymy lewa i prawa strone
@@ -261,6 +272,24 @@ class KompilatorVisitor(SigmaScriptVisitor):
                 prawe = self.tlumacz_wyrazenie(ctx.wyrazenie_arytmetyczne(1))
                 # wywolujemy bezpieczne dzielenie
                 return f"_bezpieczne_dzielenie((float)({lewe}), (float)({prawe}))"
+
+            if ctx.PLUS():
+                lewe_ctx = ctx.wyrazenie_arytmetyczne(0)
+                prawe_ctx = ctx.wyrazenie_arytmetyczne(1)
+
+                typ_lewe = self.pobierz_typ_wyrazenia(lewe_ctx)
+                typ_prawe = self.pobierz_typ_wyrazenia(prawe_ctx)
+
+                # jesli obie tekst, to konkatenacja
+                if typ_lewe == 'tekst' and typ_prawe == 'tekst':
+                    lewy_kod = self.tlumacz_wyrazenie(lewe_ctx)
+                    prawy_kod = self.tlumacz_wyrazenie(prawe_ctx)
+                    return f"_polacz_teksty({lewy_kod}, {prawy_kod})"
+                # blokada dodania tekstu do liczby
+                elif typ_lewe == 'tekst' or typ_prawe == 'tekst':
+                    blad = "[!] Błąd logiczny: Nie można dodawać tekstu do liczb!"
+                    if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+                    return "\"\""
 
         # porownywanie tekstow z strcmp
         if isinstance(ctx, SigmaScriptParser.Wyrazenie_logiczneContext):
@@ -390,10 +419,14 @@ class KompilatorVisitor(SigmaScriptVisitor):
                 prawy_typ = self.pobierz_typ_wyrazenia(
                     ctx.wyrazenie_arytmetyczne(1)) if ctx.getChildCount() > 2 else None
 
+                if lewy_typ == 'tekst' or prawy_typ == 'tekst':
+                    # mozemy dodac tekst do tekstu
+                    if ctx.PLUS() and lewy_typ == 'tekst' and prawy_typ == 'tekst':
+                        return 'tekst'
+                    return None #rzucamy blad
+
                 if lewy_typ == 'rzeczywista' or prawy_typ == 'rzeczywista':
                     return 'rzeczywista'
-                if lewy_typ == 'tekst' or prawy_typ == 'tekst':
-                    return 'tekst'
                 return 'calkowita'
 
         # sprawdzenie surowych danych
