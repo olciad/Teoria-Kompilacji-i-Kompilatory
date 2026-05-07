@@ -328,6 +328,10 @@ class KompilatorVisitor(SigmaScriptVisitor):
                     obecny_typ = self.definicje_struktur[obecny_typ][nazwa_pola]['typ_bazowy']
                 else:
                     return None
+
+        if obecny_typ == 'tekst' and len(ctx.L_KWADRAT()) > 0:
+            return 'znak'
+
         return obecny_typ
 
     #do dynamicnzego okreslania typu na potrzeby funkcji wypisz
@@ -685,6 +689,8 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
         if typ_wyrazu == 'tekst':
             self.dodaj_kod(f"    printf(\"%s\\n\", {kod_wyrazu});")
+        elif typ_wyrazu == 'znak':
+            self.dodaj_kod(f"    printf(\"%c\\n\", {kod_wyrazu});")
         elif typ_wyrazu == 'rzeczywista':
             self.dodaj_kod(f"    printf(\"%f\\n\", {kod_wyrazu});")
         else:
