@@ -371,33 +371,30 @@ class KompilatorVisitor(SigmaScriptVisitor):
         obecny_typ = info_zmiennej['typ']
         czy_tablica = info_zmiennej['czy_tablica']
 
-        # oblsuga pol struktur
-        identyfikatory = ctx.IDENT()
-        if len(identyfikatory) > 1:
-            for i in range(1, len(identyfikatory)):
-                nazwa_pola = identyfikatory[i].getText()
+        # przechozimy po odwolaniach od lewej do prawej
+        for i in range(1, ctx.getChildCount()):
+            znak = ctx.getChild(i).getText()
+
+            if znak == '[':
+                # napotkalismy indeksowanie
+                if czy_tablica:
+                    czy_tablica = False  # zdejmujemy jeden wymiar tablicy
+                elif obecny_typ == 'tekst':
+                    obecny_typ = 'znak'  # wyciagamy znak z tekstu
+            elif znak == '.':
+                pass  # ignorujemy kropke
+            elif ctx.getChild(i - 1).getText() == '.':
+                # jesli wczesniej kropka, to mamy nazwe pola
+                nazwa_pola = znak
                 if obecny_typ in self.definicje_struktur and nazwa_pola in self.definicje_struktur[obecny_typ]:
                     pole = self.definicje_struktur[obecny_typ][nazwa_pola]
                     obecny_typ = pole['typ_bazowy']
                     czy_tablica = pole['czy_tablica']
                 else:
-                    return None
+                    return None  # odwolanie do nieistniejacego pola
 
-        # obliczanie ilosci indeksowan
-        liczba_indeksowan = len(ctx.L_KWADRAT())
-
-        # jezeli tablica
-        if czy_tablica and liczba_indeksowan == 0:
+        if czy_tablica:
             return f"{obecny_typ}[]"
-
-        if liczba_indeksowan > 0:
-            if czy_tablica:
-                # zdjety wymiar tablicy
-                liczba_indeksowan -= 1
-
-            # wyciagamy pojedynczy znak
-            if liczba_indeksowan > 0 and obecny_typ == 'tekst':
-                return 'znak'
 
         return obecny_typ
 
