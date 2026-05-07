@@ -154,20 +154,25 @@ class TabelaSymboli:
             self.stos_zasiegow.pop()
 
     #dodaje zmienna do obecnego bloku kodu
-    def dodaj_zmienna(self, nazwa, typ):
+    def dodaj_zmienna(self, nazwa, typ, czy_tablica=False):
         obecny_zasieg = self.stos_zasiegow[-1]
         if nazwa in obecny_zasieg:
             return False  # rzucamy blad - zmienna juz istnieje w bloku
 
-        obecny_zasieg[nazwa] = {'typ': typ}
+        obecny_zasieg[nazwa] = {'typ': typ, 'czy_tablica': czy_tablica}
         return True
 
-    #szuka zmiennej od obecnego do globalnego bloku
-    def pobierz_typ_zmiennej(self, nazwa):
+    # szuka pelnych informacji o zmiennej
+    def pobierz_zmienna(self, nazwa):
         for zasieg in reversed(self.stos_zasiegow):
             if nazwa in zasieg:
-                return zasieg[nazwa]['typ']
-        return None  # rzucamy blad gdy zmienna nie istnieje
+                return zasieg[nazwa]
+        return None
+
+    # szuka zmiennej od obecnego do globalnego bloku
+    def pobierz_typ_zmiennej(self, nazwa):
+        zmienna = self.pobierz_zmienna(nazwa)
+        return zmienna['typ'] if zmienna else None
 
 class KompilatorVisitor(SigmaScriptVisitor):
     def __init__(self):
@@ -315,22 +320,37 @@ class KompilatorVisitor(SigmaScriptVisitor):
     #do okreslenia jakiego typu jest cel do ktorego przypisujemy wartosc
     def pobierz_typ_odwolania(self, ctx: SigmaScriptParser.OdwolanieContext):
         glowna_zmienna = ctx.IDENT(0).getText()
-        obecny_typ = self.symbole.pobierz_typ_zmiennej(glowna_zmienna)
+        info_zmiennej = self.symbole.pobierz_zmienna(glowna_zmienna)
 
-        if not obecny_typ:
+        if not info_zmiennej:
             return None
 
+        obecny_typ = info_zmiennej['typ']
+        czy_tablica = info_zmiennej['czy_tablica']
+
+        # oblsuga pol struktur
         identyfikatory = ctx.IDENT()
         if len(identyfikatory) > 1:
             for i in range(1, len(identyfikatory)):
                 nazwa_pola = identyfikatory[i].getText()
                 if obecny_typ in self.definicje_struktur and nazwa_pola in self.definicje_struktur[obecny_typ]:
-                    obecny_typ = self.definicje_struktur[obecny_typ][nazwa_pola]['typ_bazowy']
+                    pole = self.definicje_struktur[obecny_typ][nazwa_pola]
+                    obecny_typ = pole['typ_bazowy']
+                    czy_tablica = pole['czy_tablica']
                 else:
                     return None
 
-        if obecny_typ == 'tekst' and len(ctx.L_KWADRAT()) > 0:
-            return 'znak'
+        # obliczanie ilosci indeksowan
+        liczba_indeksowan = len(ctx.L_KWADRAT())
+
+        if liczba_indeksowan > 0:
+            if czy_tablica:
+                # zdjety wymiar tablicy
+                liczba_indeksowan -= 1
+
+            # wyciagamy pojedynczy znak
+            if liczba_indeksowan > 0 and obecny_typ == 'tekst':
+                return 'znak'
 
         return obecny_typ
 
@@ -528,7 +548,8 @@ class KompilatorVisitor(SigmaScriptVisitor):
             for param in ctx.parametry().parametr():
                 typ_param_sigma = param.typ().getChild(0).getText()
                 nazwa_param = param.IDENT().getText()
-                self.symbole.dodaj_zmienna(nazwa_param, typ_param_sigma)
+                czy_tablica = param.typ().wymiar_tablicy() is not None
+                self.symbole.dodaj_zmienna(nazwa_param, typ_param_sigma, czy_tablica)
         self.visit(ctx.blok_kodu())
         self.oczekiwany_typ_zwracany = None
         self.symbole.wyjdz_z_bloku()
@@ -586,8 +607,10 @@ class KompilatorVisitor(SigmaScriptVisitor):
         wymiar = ctx.typ().wymiar_tablicy().getText() if ctx.typ().wymiar_tablicy() else ""
         nazwa = ctx.IDENT().getText()
 
+        czy_tablica = ctx.typ().wymiar_tablicy() is not None
+
         # sprawdzenie czy zmienna juz istnieje
-        sukces = self.symbole.dodaj_zmienna(nazwa, typ_bazowy)
+        sukces = self.symbole.dodaj_zmienna(nazwa, typ_bazowy, czy_tablica)
         if not sukces:
             blad = f"[!] Błąd logiczny: Zmienna '{nazwa}' jest już zadeklarowana w tym bloku kodu!"
             self.bledy_semantyczne.append(blad)
