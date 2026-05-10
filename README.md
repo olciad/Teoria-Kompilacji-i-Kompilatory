@@ -219,7 +219,7 @@ instrukcja_zwrotu: ZWROC wyrazenie_ogolne? ;
 odwolanie: IDENT (L_KWADRAT wyrazenie_arytmetyczne P_KWADRAT | KROPKA IDENT)* ;
 
 // wywolywanie funkcji
-wywolanie_funkcji: IDENT L_NAWIAS argumenty? P_NAWIAS ;
+wywolanie_funkcji: IDENT L_NAWIAS argumenty? P_NAWIAS (L_KWADRAT wyrazenie_arytmetyczne P_KWADRAT)* ;
 argumenty: wyrazenie_ogolne (PRZECINEK wyrazenie_ogolne)* ;
 
 // inicjalizacja tablicy
@@ -253,9 +253,10 @@ wyrazenie_arytmetyczne: L_NAWIAS wyrazenie_arytmetyczne P_NAWIAS
                       | odwolanie
                       | LICZ_CALK
                       | LICZ_RZECZ
+                      | MINUS wyrazenie_arytmetyczne
                       | wyrazenie_arytmetyczne (RAZY | PRZEZ) wyrazenie_arytmetyczne
                       | wyrazenie_arytmetyczne (PLUS | MINUS) wyrazenie_arytmetyczne
-                      | MINUS wyrazenie_arytmetyczne
+                      | TEKST
                       ;
 ```
 # 7. Wymagania wstępne, instalacja i instrukcja obsługi

@@ -13,7 +13,7 @@ RUNTIME_C = """#include <stdio.h>
 #include <math.h>
 #include <string.h>
 
-// garbage collector
+// garbage collector dla tekstow
 typedef struct StringNode {
     char* str;
     struct StringNode* next;
@@ -28,15 +28,43 @@ void _rejestruj_tekst(char* str) {
     _string_pool = node;
 }
 
-void _wyczysc_pamiec() {
-    StringNode* current = _string_pool;
-    while (current != NULL) {
-        StringNode* next = current->next;
-        free(current->str);
-        free(current);
-        current = next;
-    }
+// garbage collector dla tablic i struktur
+typedef struct MemNode {
+    void* ptr;
+    struct MemNode* next;
+} MemNode;
+
+MemNode* _mem_pool = NULL;
+
+void _rejestruj_pamiec(void* ptr) {
+    if (!ptr) return;
+    MemNode* node = (MemNode*)malloc(sizeof(MemNode));
+    node->ptr = ptr;
+    node->next = _mem_pool;
+    _mem_pool = node;
 }
+
+void _wyczysc_pamiec() {
+    // Sprzatanie tekstow
+    StringNode* current_str = _string_pool;
+    while (current_str != NULL) {
+        StringNode* next = current_str->next;
+        free(current_str->str);
+        free(current_str);
+        current_str = next;
+    }
+    // Sprzatanie tablic
+    MemNode* current_mem = _mem_pool;
+    while (current_mem != NULL) {
+        MemNode* next = current_mem->next;
+        free(current_mem->ptr);
+        free(current_mem);
+        current_mem = next;
+    }
+    _string_pool = NULL;
+    _mem_pool = NULL;
+}
+//koniec gc
 
 char* _polacz_teksty(const char* a, const char* b) {
     // alokujemy pamiec na nowy tekst
@@ -294,6 +322,19 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
         # zabezpieczenie przed dzieleniem przez zero w wyrazeniach i konkatenacja tekstow
         if isinstance(ctx, SigmaScriptParser.Wyrazenie_arytmetyczneContext):
+            # najpierw pobieramy typy obu stron
+            lewe_ctx = ctx.wyrazenie_arytmetyczne(0)
+            prawe_ctx = ctx.wyrazenie_arytmetyczne(1) if ctx.getChildCount() > 2 else None
+
+            typ_lewe = self.pobierz_typ_wyrazenia(lewe_ctx)
+            typ_prawe = self.pobierz_typ_wyrazenia(prawe_ctx) if prawe_ctx else None
+
+            # blokujemy odejmnowanie mnozenie i dzielenie dla tekstow
+            if (ctx.MINUS() or ctx.RAZY() or ctx.PRZEZ()) and (typ_lewe == 'tekst' or typ_prawe == 'tekst'):
+                blad = "[!] Błąd logiczny: Nie można odejmować, mnożyć ani dzielić tekstów!"
+                if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+                return "\"\""  # zwracamy cos
+
             if ctx.PRZEZ():
                 # tlumaczymy lewa i prawa strone
                 lewe = self.tlumacz_wyrazenie(ctx.wyrazenie_arytmetyczne(0))
@@ -302,12 +343,6 @@ class KompilatorVisitor(SigmaScriptVisitor):
                 return f"_bezpieczne_dzielenie((float)({lewe}), (float)({prawe}))"
 
             if ctx.PLUS():
-                lewe_ctx = ctx.wyrazenie_arytmetyczne(0)
-                prawe_ctx = ctx.wyrazenie_arytmetyczne(1)
-
-                typ_lewe = self.pobierz_typ_wyrazenia(lewe_ctx)
-                typ_prawe = self.pobierz_typ_wyrazenia(prawe_ctx)
-
                 # jesli obie tekst, to konkatenacja
                 if typ_lewe == 'tekst' and typ_prawe == 'tekst':
                     lewy_kod = self.tlumacz_wyrazenie(lewe_ctx)
@@ -327,6 +362,16 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
                 typ_lewe = self.pobierz_typ_wyrazenia(lewe_ctx)
                 typ_prawe = self.pobierz_typ_wyrazenia(prawe_ctx)
+
+                #lista bezpiecznych typow
+                dozwolone_typy = ['calkowita', 'rzeczywista', 'logiczna', 'tekst', 'znak']
+
+                # jesli typ niebazowy
+                if typ_lewe not in dozwolone_typy or typ_prawe not in dozwolone_typy:
+                    blad = f"[!] Błąd logiczny: Nie można bezpośrednio porównywać tablic ani struktur (próbowano porównać '{typ_lewe}' z '{typ_prawe}'). Porównuj ich konkretne elementy lub pola!"
+                    if blad not in self.bledy_semantyczne:
+                        self.bledy_semantyczne.append(blad)
+                    return "0"
 
                 # rzutujemy == i != na strcmp dla tekstow
                 if typ_lewe == 'tekst' and typ_prawe == 'tekst':
@@ -370,6 +415,17 @@ class KompilatorVisitor(SigmaScriptVisitor):
         # weryfikacja wywolan pol uzywanych w wyrazeniach
         if isinstance(ctx, SigmaScriptParser.OdwolanieContext):
             self.weryfikuj_odwolanie(ctx)
+
+        # konwersja na C99 compound literals
+        if isinstance(ctx, SigmaScriptParser.Inicjalizacja_tablicyContext):
+            elementy = self.tlumacz_wyrazenie(ctx.argumenty()) if ctx.argumenty() else ""
+            typ_tablicy = self.pobierz_typ_wyrazenia(ctx)
+
+            # w locie budujemy tablice
+            if typ_tablicy and typ_tablicy.endswith("[]"):
+                typ_c = self.rozpoznawanie_typow(typ_tablicy[:-2])
+                return f"({typ_c}[]){{{elementy}}}"
+            return f"{{{elementy}}}"
 
         # jesli doszlismy do liscia w drzewie
         if isinstance(ctx, TerminalNode):
@@ -435,15 +491,25 @@ class KompilatorVisitor(SigmaScriptVisitor):
         if isinstance(ctx, TerminalNode):
             return None
 
-        #blokujemy traktowanie calej nowej tablicy jako pojedynczej wartosci
+        # dynamiczne ustlanie typu inicjalizowanej tablicy
         if isinstance(ctx, SigmaScriptParser.Inicjalizacja_tablicyContext):
+            if ctx.argumenty():
+                pierwszy_elem = ctx.argumenty().wyrazenie_ogolne(0)
+                typ_elementu = self.pobierz_typ_wyrazenia(pierwszy_elem)
+                if typ_elementu:
+                    return f"{typ_elementu}[]"
             return 'tablica'
 
         # konkretne bloki gramatyki - wywolania i odwolania
         if isinstance(ctx, SigmaScriptParser.Wywolanie_funkcjiContext):
             nazwa_funkcji = ctx.IDENT().getText()
             if nazwa_funkcji in self.zadeklarowane_funkcje:
-                return self.zadeklarowane_funkcje[nazwa_funkcji]['typ_zwracany']
+                typ = self.zadeklarowane_funkcje[nazwa_funkcji]['typ_zwracany']
+
+                # ucinamy nawiasy
+                if hasattr(ctx, 'L_KWADRAT') and len(ctx.L_KWADRAT()) > 0 and typ.endswith("[]"):
+                    return typ[:-2]
+                return typ
             return None
 
         if isinstance(ctx, SigmaScriptParser.OdwolanieContext):
@@ -580,7 +646,11 @@ class KompilatorVisitor(SigmaScriptVisitor):
             wymiar = deklaracja.typ().wymiar_tablicy().getText() if deklaracja.typ().wymiar_tablicy() else ""
 
             typ_c = self.rozpoznawanie_typow(typ_bazowy)
-            self.kod_struktur.append(f"    {typ_c} {nazwa_pola}{wymiar};")
+
+            if wymiar == "[]":
+                self.kod_struktur.append(f"    {typ_c}* {nazwa_pola};")
+            else:
+                self.kod_struktur.append(f"    {typ_c} {nazwa_pola}{wymiar};")
 
         self.kod_struktur.append(f"}} {nazwa_struktury};")
 
@@ -588,12 +658,22 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
     # FUNKCJE
     def visitDefinicja_funkcji(self, ctx: SigmaScriptParser.Definicja_funkcjiContext):
+        # pobieramy pelna nazwe typu
         typ_zwracany = ctx.typ_zwracany().getText()
 
-        typ_c = self.rozpoznawanie_typow(typ_zwracany)
+        # wyciagamy typ dla C
+        if ctx.typ_zwracany().PUSTA():
+            typ_c = "void"
+        else:
+            typ_bazowy_sigma = ctx.typ_zwracany().typ().getChild(0).getText()
+            typ_c = self.rozpoznawanie_typow(typ_bazowy_sigma)
+
+            # jesli funkcja zwraca tablice dajemy wskaznik w C
+            if ctx.typ_zwracany().typ().wymiar_tablicy() is not None:
+                typ_c += "*"
 
         nazwa_funkcji = ctx.IDENT().getText()
-        print(f"[Kompilator] Deklaracja funkcji: {nazwa_funkcji}")
+        print(f"[Kompilator] Deklaracja funkcji: {nazwa_funkcji} (zwraca: {typ_c})")
 
         # rejestrujemy funkcje wraz z informacją o parametrach
         typy_parametrow = []
@@ -734,17 +814,43 @@ class KompilatorVisitor(SigmaScriptVisitor):
         jest_globalnie = (len(self.symbole.stos_zasiegow) == 1)
 
         if jest_globalnie:
-            # tablice inicjalizujemy globalnie
-            if wartosc_c and wartosc_c.startswith(" = {"):
-                self.kod_globalny.append(f"{typ_c} {nazwa}{wymiar}{wartosc_c};")
+            if czy_tablica:
+                typ_wskaznika = f"{typ_c}*"
+                if wartosc_c and wartosc_c.startswith(" = {"):
+                    self.kod_globalny.append(f"{typ_c} {nazwa}{wymiar}{wartosc_c};")
+                else:
+                    # globalne wskazniki
+                    self.kod_globalny.append(f"{typ_wskaznika} {nazwa} = NULL;")
+                    if wartosc_c:
+                        self.kod_main.append(f"    {nazwa}{wartosc_c};")
+                    # rezerwacja pamieci
+                    elif wymiar and wymiar != "[]":
+                        rozmiar_liczb = wymiar[1:-1]
+                        self.kod_main.append(
+                            f"    {nazwa} = ({typ_wskaznika})calloc({rozmiar_liczb}, sizeof({typ_c}));")
+                        self.kod_main.append(f"    _rejestruj_pamiec({nazwa});")
             else:
-                # rozdzielamy deklaracje od inicjalizacji
                 self.kod_globalny.append(f"{typ_c} {nazwa}{wymiar};")
                 if wartosc_c:
                     self.kod_main.append(f"    {nazwa}{wartosc_c};")
         else:
-            # w funkcjach, petlach i warunkach deklarujemy zmienne standardowo
-            self.dodaj_kod(f"    {typ_c} {nazwa}{wymiar}{wartosc_c};")
+            if czy_tablica:
+                typ_wskaznika = f"{typ_c}*"
+                if wartosc_c and wartosc_c.startswith(" = {"):
+                    self.dodaj_kod(f"    {typ_c} _tmp_{nazwa}[] {wartosc_c};")
+                    self.dodaj_kod(f"    {typ_wskaznika} {nazwa} = ({typ_wskaznika})malloc(sizeof(_tmp_{nazwa}));")
+                    self.dodaj_kod(f"    memcpy({nazwa}, _tmp_{nazwa}, sizeof(_tmp_{nazwa}));")
+                    self.dodaj_kod(f"    _rejestruj_pamiec({nazwa});")
+                # alokujemy puste tylko jak nie dodano
+                elif wymiar and wymiar != "[]" and not wartosc_c:
+                    rozmiar_liczb = wymiar[1:-1]
+                    self.dodaj_kod(
+                        f"    {typ_wskaznika} {nazwa} = ({typ_wskaznika})calloc({rozmiar_liczb}, sizeof({typ_c}));")
+                    self.dodaj_kod(f"    _rejestruj_pamiec({nazwa});")
+                else:
+                    self.dodaj_kod(f"    {typ_wskaznika} {nazwa}{wartosc_c};")
+            else:
+                self.dodaj_kod(f"    {typ_c} {nazwa}{wymiar}{wartosc_c};")
 
         return None
 
