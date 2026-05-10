@@ -228,7 +228,6 @@ inicjalizacja_tablicy: L_KWADRAT argumenty? P_KWADRAT ;
 // wyrazenie
 wyrazenie_ogolne: wyrazenie_arytmetyczne
                 | wyrazenie_logiczne
-                | TEKST
                 | inicjalizacja_tablicy
                 ;
 

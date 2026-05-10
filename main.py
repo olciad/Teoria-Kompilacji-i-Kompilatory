@@ -523,6 +523,10 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
         # wyrazenia arytmetyczne
         if isinstance(ctx, SigmaScriptParser.Wyrazenie_arytmetyczneContext):
+
+            # obsluga unarnego minusa
+            if ctx.MINUS() and ctx.getChildCount() == 2:
+                return self.pobierz_typ_wyrazenia(ctx.wyrazenie_arytmetyczne(0))
             # dzielenie rzutujemy na float
             if ctx.PRZEZ():
                 return 'rzeczywista'
@@ -797,8 +801,12 @@ class KompilatorVisitor(SigmaScriptVisitor):
         wartosc_c = ""
         if ctx.wyrazenie_ogolne():
             wartosc_sigma = self.tlumacz_wyrazenie(ctx.wyrazenie_ogolne())
-            if wartosc_sigma.startswith("[") and wartosc_sigma.endswith("]"):
-                wartosc_c = " = {" + wartosc_sigma[1:-1] + "}"
+            czy_inicjalizacja_tablicy = isinstance(ctx.wyrazenie_ogolne(),
+                                                   SigmaScriptParser.Inicjalizacja_tablicyContext)
+
+            if czy_inicjalizacja_tablicy:
+                wartosc_c = " = " + wartosc_sigma.split("]", 1)[-1] if wartosc_sigma.startswith(
+                    "(") else " = " + wartosc_sigma
             else:
                 wartosc_c = " = " + wartosc_sigma
 
@@ -881,8 +889,9 @@ class KompilatorVisitor(SigmaScriptVisitor):
             if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
 
         # blokada przypisywania calej tablicy po deklaracji
-        if wyrazenie_c.startswith("[") and wyrazenie_c.endswith("]"):
-            blad = f"[!] Błąd logiczny: Nie można przypisać całej nowej tablicy {wyrazenie_c} po deklaracji. Zmieniaj pojedyncze elementy!"
+        czy_inicjalizacja_tablicy = isinstance(ctx.wyrazenie_ogolne(), SigmaScriptParser.Inicjalizacja_tablicyContext)
+        if czy_inicjalizacja_tablicy:
+            blad = f"[!] Błąd logiczny: Nie można przypisać całej nowej tablicy po deklaracji. Zmieniaj pojedyncze elementy!"
             if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
             return None
 
@@ -891,13 +900,15 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
     # STEROWANIE I LOGIKA
     def visitPolecenie_ruchu(self, ctx):
+        kod_wyrazenia = self.tlumacz_wyrazenie(ctx.wyrazenie_arytmetyczne())
         print(f"[Kompilator] Znalazłem ruch: naprzod {ctx.wyrazenie_arytmetyczne().getText()}")
-        self.dodaj_kod(f"    _naprzod({ctx.wyrazenie_arytmetyczne().getText()});")
+        self.dodaj_kod(f"    _naprzod({kod_wyrazenia});")
         return None
 
     def visitPolecenie_obrotu(self, ctx):
+        kod_wyrazenia = self.tlumacz_wyrazenie(ctx.wyrazenie_arytmetyczne())
         print(f"[Kompilator] Znalazłem obrót: obroc {ctx.wyrazenie_arytmetyczne().getText()}")
-        self.dodaj_kod(f"    _obroc({ctx.wyrazenie_arytmetyczne().getText()});")
+        self.dodaj_kod(f"    _obroc({kod_wyrazenia});")
         return None
 
     def visitWypisanie(self, ctx):
