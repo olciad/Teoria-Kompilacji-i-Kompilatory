@@ -85,7 +85,7 @@ float _kat = -90.0; // -90 stopni -- patrzymy w gore
 void _init_svg() {
     svg_file = fopen("wynik.svg", "w");
     fprintf(svg_file, "<svg width=\\"1000\\" height=\\"1000\\" xmlns=\\"http://www.w3.org/2000/svg\\">\\n"); //poczatek svg z deklaracja przestrzeni nazw
-    fprintf(svg_file, "<rect width=\\"100%%\\" height=\\"100%%\\" fill=\\"#f0f0f0\\"/>\\n"); // jasnoszare tlo
+    fprintf(svg_file, "<rect width=\\"100%%\\" height=\\"100%%\\" fill=\\"#ffffff\\"/>\\n"); // biale tlo
 }
 
 void _zapisz_svg() {
