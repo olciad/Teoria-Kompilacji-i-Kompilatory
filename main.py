@@ -281,26 +281,51 @@ class KompilatorVisitor(SigmaScriptVisitor):
     # weryfikacja odwolan do pol struktur
     def weryfikuj_odwolanie(self, ctx: SigmaScriptParser.OdwolanieContext):
         glowna_zmienna = ctx.IDENT(0).getText()
-        typ_zmiennej = self.symbole.pobierz_typ_zmiennej(glowna_zmienna)
+        info_zmiennej = self.symbole.pobierz_zmienna(glowna_zmienna)
 
         # jesli zmienna nie istnieje - zglaszamy blad
-        if typ_zmiennej is None:
+        if not info_zmiennej:
             blad = f"[!] Błąd logiczny: Użyto zmiennej '{glowna_zmienna}', która nie została wcześniej zadeklarowana!"
             if blad not in self.bledy_semantyczne:
                 self.bledy_semantyczne.append(blad)
             return
 
-        # sprawdzamy czy sa odwolania do pol
-        if len(ctx.IDENT()) > 1:
-            obecny_typ = typ_zmiennej
-            identyfikatory = ctx.IDENT()
+        obecny_typ = info_zmiennej['typ']
+        czy_tablica = info_zmiennej['czy_tablica']
+        poprzedni_element = glowna_zmienna
 
-            for i in range(1, len(identyfikatory)):
-                nazwa_pola = identyfikatory[i].getText()
+        # przechodzimy po AST znak po znaku
+        for i in range(1, ctx.getChildCount()):
+            znak = ctx.getChild(i).getText()
+
+            if znak == '[':
+                # napotkalismy nawiasy kwadratowe
+                if czy_tablica:
+                    czy_tablica = False  # zdjemujemy wymiar
+                elif obecny_typ == 'tekst':
+                    pass  # jak tekst to ok
+                else:
+                    blad = f"[!] Błąd logiczny: Próba użycia indeksu '[' na zmiennej '{poprzedni_element}', która nie jest tablicą!"
+                    if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+                    return
+
+            elif znak == ']':
+                pass  # ignorujemy zamkniecie nawiasu
+
+            elif znak == '.':
+                # proba wywolania pola na calej tablicy
+                if czy_tablica:
+                    blad = f"[!] Błąd logiczny: Próba odwołania do pola struktury z całej tablicy '{poprzedni_element}'. Brakuje indeksu, np. '{poprzedni_element}[0]'!"
+                    if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+                    return
+
+            elif ctx.getChild(i - 1).getText() == '.':
+                # jesli wczesniej byla kropka to znak jest nazwa pola
+                nazwa_pola = znak
 
                 # czy to na pewno struktura
                 if obecny_typ not in self.definicje_struktur:
-                    blad = f"[!] Błąd logiczny: Zmienna '{identyfikatory[i - 1].getText()}' (typu {obecny_typ}) nie jest strukturą i nie posiada pól!"
+                    blad = f"[!] Błąd logiczny: Element '{poprzedni_element}' (typu {obecny_typ}) nie jest strukturą i nie posiada pól!"
                     if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
                     return
 
@@ -312,8 +337,10 @@ class KompilatorVisitor(SigmaScriptVisitor):
                     if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
                     return
 
-                # aktualizujemy typ (obsluga zagniezdzen)
+                # aktualizujemy parametry na to czym jest aktualne pole
                 obecny_typ = struktura[nazwa_pola]['typ_bazowy']
+                czy_tablica = struktura[nazwa_pola]['czy_tablica']
+                poprzedni_element = nazwa_pola
 
     def tlumacz_wyrazenie(self, ctx):
 
