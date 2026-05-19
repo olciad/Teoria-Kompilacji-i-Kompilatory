@@ -2,16 +2,104 @@ import sys
 import os
 import subprocess
 import re
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QTextEdit,
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QTextEdit, QPlainTextEdit,
                              QSplitter, QVBoxLayout, QWidget, QPushButton,
                              QLabel, QGraphicsView, QGraphicsScene)
 from PyQt5.QtSvg import QGraphicsSvgItem
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QRect, QSize
+from PyQt5.QtGui import QPainter, QColor, QTextFormat
 
 
 def usun_kody_ansi(tekst):
     ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
     return ansi_escape.sub('', tekst)
+
+
+class ObszarNumeracjiLinii(QWidget):
+    def __init__(self, edytor):
+        super().__init__(edytor)
+        self.edytor = edytor
+
+    def sizeHint(self):
+        return QSize(self.edytor.szerokosc_obszaru_numeracji(), 0)
+
+    def paintEvent(self, event):
+        self.edytor.rysuj_numeracje_linii(event)
+
+
+class EdytorZNumeramiLinii(QPlainTextEdit):
+    def __init__(self):
+        super().__init__()
+        self.obszar_numeracji = ObszarNumeracjiLinii(self)
+
+        self.blockCountChanged.connect(self.aktualizuj_szerokosc_numeracji)
+        self.updateRequest.connect(self.aktualizuj_obszar_numeracji)
+        self.cursorPositionChanged.connect(self.podswietl_obecna_linie)
+
+        self.aktualizuj_szerokosc_numeracji(0)
+        self.podswietl_obecna_linie()
+
+    def szerokosc_obszaru_numeracji(self):
+        cyfry = 1
+        maksimum = max(1, self.blockCount())
+        while maksimum >= 10:
+            maksimum /= 10
+            cyfry += 1
+
+        # margines szerokosci dla numerow
+        szerokosc = 10 + self.fontMetrics().horizontalAdvance('9') * cyfry
+        return szerokosc
+
+    def aktualizuj_szerokosc_numeracji(self, _):
+        self.setViewportMargins(self.szerokosc_obszaru_numeracji(), 0, 0, 0)
+
+    def aktualizuj_obszar_numeracji(self, rect, dy):
+        if dy:
+            self.obszar_numeracji.scroll(0, dy)
+        else:
+            self.obszar_numeracji.update(0, rect.y(), self.obszar_numeracji.width(), rect.height())
+
+        if rect.contains(self.viewport().rect()):
+            self.aktualizuj_szerokosc_numeracji(0)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        cr = self.contentsRect()
+        self.obszar_numeracji.setGeometry(QRect(cr.left(), cr.top(), self.szerokosc_obszaru_numeracji(), cr.height()))
+
+    def rysuj_numeracje_linii(self, event):
+        painter = QPainter(self.obszar_numeracji)
+        painter.fillRect(event.rect(), QColor("#f0f0f0"))  # tlo paska z numerami
+
+        blok = self.firstVisibleBlock()
+        numer_bloku = blok.blockNumber()
+        top = round(self.blockBoundingGeometry(blok).translated(self.contentOffset()).top())
+        bottom = top + round(self.blockBoundingRect(blok).height())
+
+        while blok.isValid() and top <= event.rect().bottom():
+            if blok.isVisible() and bottom >= event.rect().top():
+                numer = str(numer_bloku + 1)
+                painter.setPen(Qt.black)  # kolor czcionki numerow
+                # rysowanie tekstu z wyrownaniem do prawej
+                painter.drawText(0, top, self.obszar_numeracji.width() - 5, self.fontMetrics().height(),
+                                 Qt.AlignRight, numer)
+
+            blok = blok.next()
+            top = bottom
+            bottom = top + round(self.blockBoundingRect(blok).height())
+            numer_bloku += 1
+
+    def podswietl_obecna_linie(self):
+        dodatkowe_selekcje = []
+        if not self.isReadOnly():
+            selekcja = QTextEdit.ExtraSelection()
+            kolor_linii = QColor("#e8f4f8")  # kolor podswietlenia biezacej linii
+            selekcja.format.setBackground(kolor_linii)
+            selekcja.format.setProperty(QTextFormat.FullWidthSelection, True)
+            selekcja.cursor = self.textCursor()
+            selekcja.cursor.clearSelection()
+            dodatkowe_selekcje.append(selekcja)
+        self.setExtraSelections(dodatkowe_selekcje)
 
 
 class AutoScalingSvgView(QGraphicsView):
@@ -91,7 +179,7 @@ class SigmaScriptIDE(QMainWindow):
         self.run_btn.clicked.connect(self.uruchom_kod)
         layout.addWidget(self.run_btn)
 
-        self.editor = QTextEdit()
+        self.editor = EdytorZNumeramiLinii()
         self.editor.setStyleSheet(STYLE["edytor_kodu"])
 
         if os.path.exists("temp.ss"):
