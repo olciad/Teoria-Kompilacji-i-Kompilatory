@@ -125,6 +125,15 @@ class SigmaScriptListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SigmaScriptParser#polecenie_pisaka.
+    def enterPolecenie_pisaka(self, ctx:SigmaScriptParser.Polecenie_pisakaContext):
+        pass
+
+    # Exit a parse tree produced by SigmaScriptParser#polecenie_pisaka.
+    def exitPolecenie_pisaka(self, ctx:SigmaScriptParser.Polecenie_pisakaContext):
+        pass
+
+
     # Enter a parse tree produced by SigmaScriptParser#petla.
     def enterPetla(self, ctx:SigmaScriptParser.PetlaContext):
         pass

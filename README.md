@@ -108,52 +108,54 @@ jezeli (moj_dron.w_powietrzu == falsz) {
 
 # 5. Opis Tokenów
 
-| **Kategoria** | **Nazwa Tokena** |  | **Opis** |
-| --- | --- | --- | --- |
-| Typy danych | CALKOWITA | `calkowita` | Liczba całkowita |
-|  | RZECZYWISTA | `rzeczywista` | Liczba zmiennoprzecinkowa |
-|  | LOGICZNA | `logiczna` | Wartość logiczna (prawda/fałsz) |
-|  | TEKST_TYP | `tekst` | Typ znakowy / string |
-|  | PUSTA | `pusta` | Typ pusty (void) do procedur |
-| Wartości log. | PRAWDA | `prawda` | Stała logiczna: prawda |
-|  | FALSZ | `falsz` | Stała logiczna: fałsz |
-| Konstrukcje | STRUKTURA | `struktura` | Deklaracja własnego typu danych |
-|  | FUNKCJA | `funkcja` | Deklaracja funkcji |
-|  | ZWROC | `zwroc` | Zwrócenie wartości z funkcji |
-| Słowa kluczowe | NAPRZOD | `naprzod` | Ruch do przodu (wbudowane) |
-|  | OBROC | `obroc` | Obrót o kąt (wbudowane) |
-|  | POWTORZ | `powtorz` | Pętla o stałej liczbie iteracji |
-|  | DOPOKI | `dopoki` | Pętla warunkowa (while) |
-|  | JEZELI | `jezeli` | Instrukcja warunkowa |
-|  | INACZEJ | `inaczej` | Alternatywa warunkowa |
-|  | WYPISZ | `wypisz` | Wyświetlanie tekstu/wyniku |
-|  | USTAW | `ustaw` | Przypisanie nowej wartości |
-| Operatory | PLUS / MINUS | `+` / `-` | Operacje arytmetyczne |
-|  | RAZY / PRZEZ | `*` / `/` | Mnożenie i dzielenie |
-|  | PRZYPIS | `=` | Operator przypisania |
-|  | ROWNY | `==` | Operator porównania |
-|  | ROZNY | `!=` | Operator różności |
-|  | MNIEJSZY | `<` | Relacja mniejszości |
-|  | WIEKSZY | `>` | Relacja większości |
-|  | MNIEJ_ROWN | `<=` | Relacja mniejszy lub równy |
-|  | WIEC_ROWN | `>=` | Relacja większy lub równy |
-|  | ORAZ | `oraz` | Koniunkcja logiczna |
-|  | LUB | `lub` | Alternatywa logiczna |
-|  | NIE | `nie` | Negacja logiczna |
-| Separatory | L_NAWIAS | `(` | Początek wyrażenia/argumentów |
-|  | P_NAWIAS | `)` | Koniec wyrażenia/argumentów |
-|  | L_KLAMRA | `{` | Początek bloku kodu |
-|  | P_KLAMRA | `}` | Koniec bloku kodu |
-|  | L_KWADRAT | `[` | Początek indeksu tablicy / listy |
-|  | P_KWADRAT | `]` | Koniec indeksu tablicy / listy |
-|  | KROPKA | `.` | Dostęp do pól struktury |
-|  | PRZECINEK | `,` | Oddzielenie argumentów |
-| Wartości | LICZ_CALK | `[0-9]+` | Literały całkowite |
-|  | LICZ_RZECZ | `[0-9]+\.[0-9]+` | Literały rzeczywiste (z kropką) |
-|  | IDENT | `[a-zA-Z_][a-zA-Z0-9_]*` | Nazwy zmiennych, funkcji, struktur |
-|  | TEKST | `"[^"]*"` | Napisy w cudzysłowie |
-| Ignorowane | BIALE_ZNAKI | `[ \t\r\n]+` | Spacje, taby, entery |
-|  | KOMENTARZ | `//.*` | Komentarze jednolinijkowe |
+| **Kategoria** | **Nazwa Tokena** |                          | **Opis**                           |
+| --- |------------------|--------------------------|------------------------------------|
+| Typy danych | CALKOWITA        | `calkowita`              | Liczba całkowita                   |
+|  | RZECZYWISTA      | `rzeczywista`            | Liczba zmiennoprzecinkowa          |
+|  | LOGICZNA         | `logiczna`               | Wartość logiczna (prawda/fałsz)    |
+|  | TEKST_TYP        | `tekst`                  | Typ znakowy / string               |
+|  | PUSTA            | `pusta`                  | Typ pusty (void) do procedur       |
+| Wartości log. | PRAWDA           | `prawda`                 | Stała logiczna: prawda             |
+|  | FALSZ            | `falsz`                  | Stała logiczna: fałsz              |
+| Konstrukcje | STRUKTURA        | `struktura`              | Deklaracja własnego typu danych    |
+|  | FUNKCJA          | `funkcja`                | Deklaracja funkcji                 |
+|  | ZWROC            | `zwroc`                  | Zwrócenie wartości z funkcji       |
+| Słowa kluczowe | NAPRZOD          | `naprzod`                | Ruch do przodu (wbudowane)         |
+|  | OBROC            | `obroc`                  | Obrót o kąt (wbudowane)            |
+|  | PODNIES          | `podnies`                | Zaprzestanie rysowania (wbudowane) |
+|  | OPUSC            | `opusc`                  | Rozpoczęcie rysowania (wbudowane)  |
+|  | POWTORZ          | `powtorz`                | Pętla o stałej liczbie iteracji    |
+|  | DOPOKI           | `dopoki`                 | Pętla warunkowa (while)            |
+|  | JEZELI           | `jezeli`                 | Instrukcja warunkowa               |
+|  | INACZEJ          | `inaczej`                | Alternatywa warunkowa              |
+|  | WYPISZ           | `wypisz`                 | Wyświetlanie tekstu/wyniku         |
+|  | USTAW            | `ustaw`                  | Przypisanie nowej wartości         |
+| Operatory | PLUS / MINUS     | `+` / `-`                | Operacje arytmetyczne              |
+|  | RAZY / PRZEZ     | `*` / `/`                | Mnożenie i dzielenie               |
+|  | PRZYPIS          | `=`                      | Operator przypisania               |
+|  | ROWNY            | `==`                     | Operator porównania                |
+|  | ROZNY            | `!=`                     | Operator różności                  |
+|  | MNIEJSZY         | `<`                      | Relacja mniejszości                |
+|  | WIEKSZY          | `>`                      | Relacja większości                 |
+|  | MNIEJ_ROWN       | `<=`                     | Relacja mniejszy lub równy         |
+|  | WIEC_ROWN        | `>=`                     | Relacja większy lub równy          |
+|  | ORAZ             | `oraz`                   | Koniunkcja logiczna                |
+|  | LUB              | `lub`                    | Alternatywa logiczna               |
+|  | NIE              | `nie`                    | Negacja logiczna                   |
+| Separatory | L_NAWIAS         | `(`                      | Początek wyrażenia/argumentów      |
+|  | P_NAWIAS         | `)`                      | Koniec wyrażenia/argumentów        |
+|  | L_KLAMRA         | `{`                      | Początek bloku kodu                |
+|  | P_KLAMRA         | `}`                      | Koniec bloku kodu                  |
+|  | L_KWADRAT        | `[`                      | Początek indeksu tablicy / listy   |
+|  | P_KWADRAT        | `]`                      | Koniec indeksu tablicy / listy     |
+|  | KROPKA           | `.`                      | Dostęp do pól struktury            |
+|  | PRZECINEK        | `,`                      | Oddzielenie argumentów             |
+| Wartości | LICZ_CALK        | `[0-9]+`                 | Literały całkowite                 |
+|  | LICZ_RZECZ       | `[0-9]+\.[0-9]+`         | Literały rzeczywiste (z kropką)    |
+|  | IDENT            | `[a-zA-Z_][a-zA-Z0-9_]*` | Nazwy zmiennych, funkcji, struktur |
+|  | TEKST            | `"[^"]*"`                | Napisy w cudzysłowie               |
+| Ignorowane | BIALE_ZNAKI      | `[ \t\r\n]+`             | Spacje, taby, entery               |
+|  | KOMENTARZ        | `//.*`                   | Komentarze jednolinijkowe          |
 
 # 6. Gramatyka
 Gramatyka została zapisana w notacji generatora ANTLR4 
@@ -188,6 +190,7 @@ blok_kodu: L_KLAMRA instrukcja* P_KLAMRA ;
 // instrukcje
 instrukcja: polecenie_ruchu
           | polecenie_obrotu
+          | polecenie_pisaka
           | petla
           | petla_warunkowa
           | instrukcja_warunkowa
@@ -201,6 +204,7 @@ instrukcja: polecenie_ruchu
 // polecenia zolwia
 polecenie_ruchu: NAPRZOD wyrazenie_arytmetyczne ;
 polecenie_obrotu: OBROC wyrazenie_arytmetyczne ;
+polecenie_pisaka: PODNIES | OPUSC ;
 
 // petle
 petla: POWTORZ wyrazenie_arytmetyczne blok_kodu ;

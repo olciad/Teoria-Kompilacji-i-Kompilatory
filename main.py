@@ -80,6 +80,15 @@ char* _polacz_teksty(const char* a, const char* b) {
 float _x = 0.0; // teraz startujemy z (0, 0)
 float _y = 0.0;
 float _kat = -90.0; // -90 stopni -- patrzymy w gore
+int _pisak_opuszczony = 1; // 1 = opuszczony (rysuje), 0 = podniesiony (nie rysuje)
+
+void _podnies_pisak() {
+    _pisak_opuszczony = 0;
+}
+
+void _opusc_pisak() {
+    _pisak_opuszczony = 1;
+}
 
 // zmienne sledzace granice rysunku (bounding box)
 float _min_x = 0.0;
@@ -148,17 +157,19 @@ void _naprzod(float dystans) {
     float new_x = _x + dystans * cos(rad);
     float new_y = _y + dystans * sin(rad);
 
-    // wrzucamy linie do pamieci podrecznej 
-    LineNode* node = (LineNode*)malloc(sizeof(LineNode));
-    node->x1 = _x; node->y1 = _y; node->x2 = new_x; node->y2 = new_y;
-    node->next = NULL;
-
-    if (_lines_tail == NULL) {
-        _lines_head = node;
-        _lines_tail = node;
-    } else {
-        _lines_tail->next = node;
-        _lines_tail = node;
+    if (_pisak_opuszczony){
+        // wrzucamy linie do pamieci podrecznej 
+        LineNode* node = (LineNode*)malloc(sizeof(LineNode));
+        node->x1 = _x; node->y1 = _y; node->x2 = new_x; node->y2 = new_y;
+        node->next = NULL;
+    
+        if (_lines_tail == NULL) {
+            _lines_head = node;
+            _lines_tail = node;
+        } else {
+            _lines_tail->next = node;
+            _lines_tail = node;
+        }
     }
 
     // sprawdzamy czy nie poszerzylismy granic
@@ -1000,6 +1011,15 @@ class KompilatorVisitor(SigmaScriptVisitor):
         kod_wyrazenia = self.tlumacz_wyrazenie(ctx.wyrazenie_arytmetyczne())
         print(f"[Kompilator] Znalazłem obrót: obroc {ctx.wyrazenie_arytmetyczne().getText()}")
         self.dodaj_kod(f"    _obroc({kod_wyrazenia});")
+        return None
+
+    def visitPolecenie_pisaka(self, ctx):
+        if ctx.PODNIES():
+            print("[Kompilator] Znalazłem polecenie: podnies_pisak")
+            self.dodaj_kod("    _podnies_pisak();")
+        elif ctx.OPUSC():
+            print("[Kompilator] Znalazłem polecenie: opusc_pisak")
+            self.dodaj_kod("    _opusc_pisak();")
         return None
 
     def visitWypisanie(self, ctx):

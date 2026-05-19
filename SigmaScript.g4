@@ -33,6 +33,7 @@ blok_kodu: L_KLAMRA instrukcja* P_KLAMRA ;
 // instrukcje
 instrukcja: polecenie_ruchu
           | polecenie_obrotu
+          | polecenie_pisaka
           | petla
           | petla_warunkowa
           | instrukcja_warunkowa
@@ -46,6 +47,7 @@ instrukcja: polecenie_ruchu
 // polecenia zolwia
 polecenie_ruchu: NAPRZOD wyrazenie_arytmetyczne ;
 polecenie_obrotu: OBROC wyrazenie_arytmetyczne ;
+polecenie_pisaka: PODNIES | OPUSC ;
 
 // petle
 petla: POWTORZ wyrazenie_arytmetyczne blok_kodu ;
@@ -126,6 +128,8 @@ FALSZ: 'falsz';
 // instrukcje bazowe
 NAPRZOD: 'naprzod';
 OBROC: 'obroc';
+PODNIES: 'podnies';
+OPUSC: 'opusc';
 POWTORZ: 'powtorz';
 DOPOKI: 'dopoki';
 JEZELI: 'jezeli';

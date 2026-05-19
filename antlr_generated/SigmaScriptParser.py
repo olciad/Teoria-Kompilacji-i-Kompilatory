@@ -10,108 +10,110 @@ else:
 
 def serializedATN():
     return [
-        4,1,46,285,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
+        4,1,48,290,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
         6,2,7,7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,
         2,14,7,14,2,15,7,15,2,16,7,16,2,17,7,17,2,18,7,18,2,19,7,19,2,20,
         7,20,2,21,7,21,2,22,7,22,2,23,7,23,2,24,7,24,2,25,7,25,2,26,7,26,
-        2,27,7,27,1,0,5,0,58,8,0,10,0,12,0,61,9,0,1,0,1,0,1,1,1,1,1,1,3,
-        1,68,8,1,1,2,1,2,1,2,1,2,5,2,74,8,2,10,2,12,2,77,9,2,1,2,1,2,1,3,
-        1,3,1,3,1,3,1,3,3,3,86,8,3,1,3,1,3,1,3,1,4,1,4,1,4,5,4,94,8,4,10,
-        4,12,4,97,9,4,1,5,1,5,1,5,1,6,1,6,3,6,104,8,6,1,7,1,7,3,7,108,8,
-        7,1,8,1,8,3,8,112,8,8,1,8,1,8,1,9,1,9,5,9,118,8,9,10,9,12,9,121,
-        9,9,1,9,1,9,1,10,1,10,1,10,1,10,1,10,1,10,1,10,1,10,1,10,1,10,3,
-        10,135,8,10,1,11,1,11,1,11,1,12,1,12,1,12,1,13,1,13,1,13,1,13,1,
-        14,1,14,1,14,1,14,1,14,1,14,1,15,1,15,1,15,1,15,1,15,1,15,1,15,3,
-        15,160,8,15,1,16,1,16,1,16,1,17,1,17,1,17,1,17,3,17,169,8,17,1,18,
-        1,18,1,18,1,18,1,18,1,19,1,19,3,19,178,8,19,1,20,1,20,1,20,1,20,
-        1,20,1,20,1,20,5,20,187,8,20,10,20,12,20,190,9,20,1,21,1,21,1,21,
-        3,21,195,8,21,1,21,1,21,1,21,1,21,1,21,5,21,202,8,21,10,21,12,21,
-        205,9,21,1,22,1,22,1,22,5,22,210,8,22,10,22,12,22,213,9,22,1,23,
-        1,23,3,23,217,8,23,1,23,1,23,1,24,1,24,1,24,3,24,224,8,24,1,25,1,
-        25,1,25,1,25,1,25,1,25,1,25,1,25,1,25,1,25,1,25,1,25,1,25,1,25,1,
-        25,1,25,3,25,242,8,25,1,25,1,25,1,25,1,25,1,25,1,25,1,25,1,25,1,
-        25,5,25,253,8,25,10,25,12,25,256,9,25,1,26,1,26,1,27,1,27,1,27,1,
-        27,1,27,1,27,1,27,1,27,1,27,1,27,1,27,1,27,3,27,272,8,27,1,27,1,
-        27,1,27,1,27,1,27,1,27,5,27,280,8,27,10,27,12,27,283,9,27,1,27,0,
-        2,50,54,28,0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,
-        40,42,44,46,48,50,52,54,0,5,2,0,1,4,43,43,1,0,27,28,1,0,27,32,1,
-        0,24,25,1,0,22,23,304,0,59,1,0,0,0,2,67,1,0,0,0,4,69,1,0,0,0,6,80,
-        1,0,0,0,8,90,1,0,0,0,10,98,1,0,0,0,12,103,1,0,0,0,14,105,1,0,0,0,
-        16,109,1,0,0,0,18,115,1,0,0,0,20,134,1,0,0,0,22,136,1,0,0,0,24,139,
-        1,0,0,0,26,142,1,0,0,0,28,146,1,0,0,0,30,152,1,0,0,0,32,161,1,0,
-        0,0,34,164,1,0,0,0,36,170,1,0,0,0,38,175,1,0,0,0,40,179,1,0,0,0,
-        42,191,1,0,0,0,44,206,1,0,0,0,46,214,1,0,0,0,48,223,1,0,0,0,50,241,
-        1,0,0,0,52,257,1,0,0,0,54,271,1,0,0,0,56,58,3,2,1,0,57,56,1,0,0,
-        0,58,61,1,0,0,0,59,57,1,0,0,0,59,60,1,0,0,0,60,62,1,0,0,0,61,59,
-        1,0,0,0,62,63,5,0,0,1,63,1,1,0,0,0,64,68,3,20,10,0,65,68,3,4,2,0,
-        66,68,3,6,3,0,67,64,1,0,0,0,67,65,1,0,0,0,67,66,1,0,0,0,68,3,1,0,
-        0,0,69,70,5,6,0,0,70,71,5,43,0,0,71,75,5,35,0,0,72,74,3,34,17,0,
-        73,72,1,0,0,0,74,77,1,0,0,0,75,73,1,0,0,0,75,76,1,0,0,0,76,78,1,
-        0,0,0,77,75,1,0,0,0,78,79,5,36,0,0,79,5,1,0,0,0,80,81,5,7,0,0,81,
-        82,3,12,6,0,82,83,5,43,0,0,83,85,5,33,0,0,84,86,3,8,4,0,85,84,1,
-        0,0,0,85,86,1,0,0,0,86,87,1,0,0,0,87,88,5,34,0,0,88,89,3,18,9,0,
-        89,7,1,0,0,0,90,95,3,10,5,0,91,92,5,40,0,0,92,94,3,10,5,0,93,91,
-        1,0,0,0,94,97,1,0,0,0,95,93,1,0,0,0,95,96,1,0,0,0,96,9,1,0,0,0,97,
-        95,1,0,0,0,98,99,3,14,7,0,99,100,5,43,0,0,100,11,1,0,0,0,101,104,
-        3,14,7,0,102,104,5,5,0,0,103,101,1,0,0,0,103,102,1,0,0,0,104,13,
-        1,0,0,0,105,107,7,0,0,0,106,108,3,16,8,0,107,106,1,0,0,0,107,108,
-        1,0,0,0,108,15,1,0,0,0,109,111,5,37,0,0,110,112,5,41,0,0,111,110,
-        1,0,0,0,111,112,1,0,0,0,112,113,1,0,0,0,113,114,5,38,0,0,114,17,
-        1,0,0,0,115,119,5,35,0,0,116,118,3,20,10,0,117,116,1,0,0,0,118,121,
-        1,0,0,0,119,117,1,0,0,0,119,120,1,0,0,0,120,122,1,0,0,0,121,119,
-        1,0,0,0,122,123,5,36,0,0,123,19,1,0,0,0,124,135,3,22,11,0,125,135,
-        3,24,12,0,126,135,3,26,13,0,127,135,3,28,14,0,128,135,3,30,15,0,
-        129,135,3,32,16,0,130,135,3,34,17,0,131,135,3,36,18,0,132,135,3,
-        38,19,0,133,135,3,42,21,0,134,124,1,0,0,0,134,125,1,0,0,0,134,126,
-        1,0,0,0,134,127,1,0,0,0,134,128,1,0,0,0,134,129,1,0,0,0,134,130,
-        1,0,0,0,134,131,1,0,0,0,134,132,1,0,0,0,134,133,1,0,0,0,135,21,1,
-        0,0,0,136,137,5,11,0,0,137,138,3,54,27,0,138,23,1,0,0,0,139,140,
-        5,12,0,0,140,141,3,54,27,0,141,25,1,0,0,0,142,143,5,13,0,0,143,144,
-        3,54,27,0,144,145,3,18,9,0,145,27,1,0,0,0,146,147,5,14,0,0,147,148,
-        5,33,0,0,148,149,3,50,25,0,149,150,5,34,0,0,150,151,3,18,9,0,151,
-        29,1,0,0,0,152,153,5,15,0,0,153,154,5,33,0,0,154,155,3,50,25,0,155,
-        156,5,34,0,0,156,159,3,18,9,0,157,158,5,16,0,0,158,160,3,18,9,0,
-        159,157,1,0,0,0,159,160,1,0,0,0,160,31,1,0,0,0,161,162,5,17,0,0,
-        162,163,3,48,24,0,163,33,1,0,0,0,164,165,3,14,7,0,165,168,5,43,0,
-        0,166,167,5,26,0,0,167,169,3,48,24,0,168,166,1,0,0,0,168,169,1,0,
-        0,0,169,35,1,0,0,0,170,171,5,18,0,0,171,172,3,40,20,0,172,173,5,
-        26,0,0,173,174,3,48,24,0,174,37,1,0,0,0,175,177,5,8,0,0,176,178,
-        3,48,24,0,177,176,1,0,0,0,177,178,1,0,0,0,178,39,1,0,0,0,179,188,
-        5,43,0,0,180,181,5,37,0,0,181,182,3,54,27,0,182,183,5,38,0,0,183,
-        187,1,0,0,0,184,185,5,39,0,0,185,187,5,43,0,0,186,180,1,0,0,0,186,
-        184,1,0,0,0,187,190,1,0,0,0,188,186,1,0,0,0,188,189,1,0,0,0,189,
-        41,1,0,0,0,190,188,1,0,0,0,191,192,5,43,0,0,192,194,5,33,0,0,193,
-        195,3,44,22,0,194,193,1,0,0,0,194,195,1,0,0,0,195,196,1,0,0,0,196,
-        203,5,34,0,0,197,198,5,37,0,0,198,199,3,54,27,0,199,200,5,38,0,0,
-        200,202,1,0,0,0,201,197,1,0,0,0,202,205,1,0,0,0,203,201,1,0,0,0,
-        203,204,1,0,0,0,204,43,1,0,0,0,205,203,1,0,0,0,206,211,3,48,24,0,
-        207,208,5,40,0,0,208,210,3,48,24,0,209,207,1,0,0,0,210,213,1,0,0,
-        0,211,209,1,0,0,0,211,212,1,0,0,0,212,45,1,0,0,0,213,211,1,0,0,0,
-        214,216,5,37,0,0,215,217,3,44,22,0,216,215,1,0,0,0,216,217,1,0,0,
-        0,217,218,1,0,0,0,218,219,5,38,0,0,219,47,1,0,0,0,220,224,3,54,27,
-        0,221,224,3,50,25,0,222,224,3,46,23,0,223,220,1,0,0,0,223,221,1,
-        0,0,0,223,222,1,0,0,0,224,49,1,0,0,0,225,226,6,25,-1,0,226,227,5,
-        33,0,0,227,228,3,50,25,0,228,229,5,34,0,0,229,242,1,0,0,0,230,242,
-        5,9,0,0,231,242,5,10,0,0,232,242,5,44,0,0,233,242,3,42,21,0,234,
-        242,3,40,20,0,235,236,3,54,27,0,236,237,3,52,26,0,237,238,3,54,27,
-        0,238,242,1,0,0,0,239,240,5,21,0,0,240,242,3,50,25,3,241,225,1,0,
-        0,0,241,230,1,0,0,0,241,231,1,0,0,0,241,232,1,0,0,0,241,233,1,0,
-        0,0,241,234,1,0,0,0,241,235,1,0,0,0,241,239,1,0,0,0,242,254,1,0,
-        0,0,243,244,10,4,0,0,244,245,7,1,0,0,245,253,3,50,25,5,246,247,10,
-        2,0,0,247,248,5,19,0,0,248,253,3,50,25,3,249,250,10,1,0,0,250,251,
-        5,20,0,0,251,253,3,50,25,2,252,243,1,0,0,0,252,246,1,0,0,0,252,249,
-        1,0,0,0,253,256,1,0,0,0,254,252,1,0,0,0,254,255,1,0,0,0,255,51,1,
-        0,0,0,256,254,1,0,0,0,257,258,7,2,0,0,258,53,1,0,0,0,259,260,6,27,
-        -1,0,260,261,5,33,0,0,261,262,3,54,27,0,262,263,5,34,0,0,263,272,
-        1,0,0,0,264,272,3,42,21,0,265,272,3,40,20,0,266,272,5,41,0,0,267,
-        272,5,42,0,0,268,269,5,23,0,0,269,272,3,54,27,4,270,272,5,44,0,0,
-        271,259,1,0,0,0,271,264,1,0,0,0,271,265,1,0,0,0,271,266,1,0,0,0,
-        271,267,1,0,0,0,271,268,1,0,0,0,271,270,1,0,0,0,272,281,1,0,0,0,
-        273,274,10,3,0,0,274,275,7,3,0,0,275,280,3,54,27,4,276,277,10,2,
-        0,0,277,278,7,4,0,0,278,280,3,54,27,3,279,273,1,0,0,0,279,276,1,
-        0,0,0,280,283,1,0,0,0,281,279,1,0,0,0,281,282,1,0,0,0,282,55,1,0,
-        0,0,283,281,1,0,0,0,26,59,67,75,85,95,103,107,111,119,134,159,168,
-        177,186,188,194,203,211,216,223,241,252,254,271,279,281
+        2,27,7,27,2,28,7,28,1,0,5,0,60,8,0,10,0,12,0,63,9,0,1,0,1,0,1,1,
+        1,1,1,1,3,1,70,8,1,1,2,1,2,1,2,1,2,5,2,76,8,2,10,2,12,2,79,9,2,1,
+        2,1,2,1,3,1,3,1,3,1,3,1,3,3,3,88,8,3,1,3,1,3,1,3,1,4,1,4,1,4,5,4,
+        96,8,4,10,4,12,4,99,9,4,1,5,1,5,1,5,1,6,1,6,3,6,106,8,6,1,7,1,7,
+        3,7,110,8,7,1,8,1,8,3,8,114,8,8,1,8,1,8,1,9,1,9,5,9,120,8,9,10,9,
+        12,9,123,9,9,1,9,1,9,1,10,1,10,1,10,1,10,1,10,1,10,1,10,1,10,1,10,
+        1,10,1,10,3,10,138,8,10,1,11,1,11,1,11,1,12,1,12,1,12,1,13,1,13,
+        1,14,1,14,1,14,1,14,1,15,1,15,1,15,1,15,1,15,1,15,1,16,1,16,1,16,
+        1,16,1,16,1,16,1,16,3,16,165,8,16,1,17,1,17,1,17,1,18,1,18,1,18,
+        1,18,3,18,174,8,18,1,19,1,19,1,19,1,19,1,19,1,20,1,20,3,20,183,8,
+        20,1,21,1,21,1,21,1,21,1,21,1,21,1,21,5,21,192,8,21,10,21,12,21,
+        195,9,21,1,22,1,22,1,22,3,22,200,8,22,1,22,1,22,1,22,1,22,1,22,5,
+        22,207,8,22,10,22,12,22,210,9,22,1,23,1,23,1,23,5,23,215,8,23,10,
+        23,12,23,218,9,23,1,24,1,24,3,24,222,8,24,1,24,1,24,1,25,1,25,1,
+        25,3,25,229,8,25,1,26,1,26,1,26,1,26,1,26,1,26,1,26,1,26,1,26,1,
+        26,1,26,1,26,1,26,1,26,1,26,1,26,3,26,247,8,26,1,26,1,26,1,26,1,
+        26,1,26,1,26,1,26,1,26,1,26,5,26,258,8,26,10,26,12,26,261,9,26,1,
+        27,1,27,1,28,1,28,1,28,1,28,1,28,1,28,1,28,1,28,1,28,1,28,1,28,1,
+        28,3,28,277,8,28,1,28,1,28,1,28,1,28,1,28,1,28,5,28,285,8,28,10,
+        28,12,28,288,9,28,1,28,0,2,52,56,29,0,2,4,6,8,10,12,14,16,18,20,
+        22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,0,6,2,0,1,
+        4,45,45,1,0,13,14,1,0,29,30,1,0,29,34,1,0,26,27,1,0,24,25,309,0,
+        61,1,0,0,0,2,69,1,0,0,0,4,71,1,0,0,0,6,82,1,0,0,0,8,92,1,0,0,0,10,
+        100,1,0,0,0,12,105,1,0,0,0,14,107,1,0,0,0,16,111,1,0,0,0,18,117,
+        1,0,0,0,20,137,1,0,0,0,22,139,1,0,0,0,24,142,1,0,0,0,26,145,1,0,
+        0,0,28,147,1,0,0,0,30,151,1,0,0,0,32,157,1,0,0,0,34,166,1,0,0,0,
+        36,169,1,0,0,0,38,175,1,0,0,0,40,180,1,0,0,0,42,184,1,0,0,0,44,196,
+        1,0,0,0,46,211,1,0,0,0,48,219,1,0,0,0,50,228,1,0,0,0,52,246,1,0,
+        0,0,54,262,1,0,0,0,56,276,1,0,0,0,58,60,3,2,1,0,59,58,1,0,0,0,60,
+        63,1,0,0,0,61,59,1,0,0,0,61,62,1,0,0,0,62,64,1,0,0,0,63,61,1,0,0,
+        0,64,65,5,0,0,1,65,1,1,0,0,0,66,70,3,20,10,0,67,70,3,4,2,0,68,70,
+        3,6,3,0,69,66,1,0,0,0,69,67,1,0,0,0,69,68,1,0,0,0,70,3,1,0,0,0,71,
+        72,5,6,0,0,72,73,5,45,0,0,73,77,5,37,0,0,74,76,3,36,18,0,75,74,1,
+        0,0,0,76,79,1,0,0,0,77,75,1,0,0,0,77,78,1,0,0,0,78,80,1,0,0,0,79,
+        77,1,0,0,0,80,81,5,38,0,0,81,5,1,0,0,0,82,83,5,7,0,0,83,84,3,12,
+        6,0,84,85,5,45,0,0,85,87,5,35,0,0,86,88,3,8,4,0,87,86,1,0,0,0,87,
+        88,1,0,0,0,88,89,1,0,0,0,89,90,5,36,0,0,90,91,3,18,9,0,91,7,1,0,
+        0,0,92,97,3,10,5,0,93,94,5,42,0,0,94,96,3,10,5,0,95,93,1,0,0,0,96,
+        99,1,0,0,0,97,95,1,0,0,0,97,98,1,0,0,0,98,9,1,0,0,0,99,97,1,0,0,
+        0,100,101,3,14,7,0,101,102,5,45,0,0,102,11,1,0,0,0,103,106,3,14,
+        7,0,104,106,5,5,0,0,105,103,1,0,0,0,105,104,1,0,0,0,106,13,1,0,0,
+        0,107,109,7,0,0,0,108,110,3,16,8,0,109,108,1,0,0,0,109,110,1,0,0,
+        0,110,15,1,0,0,0,111,113,5,39,0,0,112,114,5,43,0,0,113,112,1,0,0,
+        0,113,114,1,0,0,0,114,115,1,0,0,0,115,116,5,40,0,0,116,17,1,0,0,
+        0,117,121,5,37,0,0,118,120,3,20,10,0,119,118,1,0,0,0,120,123,1,0,
+        0,0,121,119,1,0,0,0,121,122,1,0,0,0,122,124,1,0,0,0,123,121,1,0,
+        0,0,124,125,5,38,0,0,125,19,1,0,0,0,126,138,3,22,11,0,127,138,3,
+        24,12,0,128,138,3,26,13,0,129,138,3,28,14,0,130,138,3,30,15,0,131,
+        138,3,32,16,0,132,138,3,34,17,0,133,138,3,36,18,0,134,138,3,38,19,
+        0,135,138,3,40,20,0,136,138,3,44,22,0,137,126,1,0,0,0,137,127,1,
+        0,0,0,137,128,1,0,0,0,137,129,1,0,0,0,137,130,1,0,0,0,137,131,1,
+        0,0,0,137,132,1,0,0,0,137,133,1,0,0,0,137,134,1,0,0,0,137,135,1,
+        0,0,0,137,136,1,0,0,0,138,21,1,0,0,0,139,140,5,11,0,0,140,141,3,
+        56,28,0,141,23,1,0,0,0,142,143,5,12,0,0,143,144,3,56,28,0,144,25,
+        1,0,0,0,145,146,7,1,0,0,146,27,1,0,0,0,147,148,5,15,0,0,148,149,
+        3,56,28,0,149,150,3,18,9,0,150,29,1,0,0,0,151,152,5,16,0,0,152,153,
+        5,35,0,0,153,154,3,52,26,0,154,155,5,36,0,0,155,156,3,18,9,0,156,
+        31,1,0,0,0,157,158,5,17,0,0,158,159,5,35,0,0,159,160,3,52,26,0,160,
+        161,5,36,0,0,161,164,3,18,9,0,162,163,5,18,0,0,163,165,3,18,9,0,
+        164,162,1,0,0,0,164,165,1,0,0,0,165,33,1,0,0,0,166,167,5,19,0,0,
+        167,168,3,50,25,0,168,35,1,0,0,0,169,170,3,14,7,0,170,173,5,45,0,
+        0,171,172,5,28,0,0,172,174,3,50,25,0,173,171,1,0,0,0,173,174,1,0,
+        0,0,174,37,1,0,0,0,175,176,5,20,0,0,176,177,3,42,21,0,177,178,5,
+        28,0,0,178,179,3,50,25,0,179,39,1,0,0,0,180,182,5,8,0,0,181,183,
+        3,50,25,0,182,181,1,0,0,0,182,183,1,0,0,0,183,41,1,0,0,0,184,193,
+        5,45,0,0,185,186,5,39,0,0,186,187,3,56,28,0,187,188,5,40,0,0,188,
+        192,1,0,0,0,189,190,5,41,0,0,190,192,5,45,0,0,191,185,1,0,0,0,191,
+        189,1,0,0,0,192,195,1,0,0,0,193,191,1,0,0,0,193,194,1,0,0,0,194,
+        43,1,0,0,0,195,193,1,0,0,0,196,197,5,45,0,0,197,199,5,35,0,0,198,
+        200,3,46,23,0,199,198,1,0,0,0,199,200,1,0,0,0,200,201,1,0,0,0,201,
+        208,5,36,0,0,202,203,5,39,0,0,203,204,3,56,28,0,204,205,5,40,0,0,
+        205,207,1,0,0,0,206,202,1,0,0,0,207,210,1,0,0,0,208,206,1,0,0,0,
+        208,209,1,0,0,0,209,45,1,0,0,0,210,208,1,0,0,0,211,216,3,50,25,0,
+        212,213,5,42,0,0,213,215,3,50,25,0,214,212,1,0,0,0,215,218,1,0,0,
+        0,216,214,1,0,0,0,216,217,1,0,0,0,217,47,1,0,0,0,218,216,1,0,0,0,
+        219,221,5,39,0,0,220,222,3,46,23,0,221,220,1,0,0,0,221,222,1,0,0,
+        0,222,223,1,0,0,0,223,224,5,40,0,0,224,49,1,0,0,0,225,229,3,56,28,
+        0,226,229,3,52,26,0,227,229,3,48,24,0,228,225,1,0,0,0,228,226,1,
+        0,0,0,228,227,1,0,0,0,229,51,1,0,0,0,230,231,6,26,-1,0,231,232,5,
+        35,0,0,232,233,3,52,26,0,233,234,5,36,0,0,234,247,1,0,0,0,235,247,
+        5,9,0,0,236,247,5,10,0,0,237,247,5,46,0,0,238,247,3,44,22,0,239,
+        247,3,42,21,0,240,241,3,56,28,0,241,242,3,54,27,0,242,243,3,56,28,
+        0,243,247,1,0,0,0,244,245,5,23,0,0,245,247,3,52,26,3,246,230,1,0,
+        0,0,246,235,1,0,0,0,246,236,1,0,0,0,246,237,1,0,0,0,246,238,1,0,
+        0,0,246,239,1,0,0,0,246,240,1,0,0,0,246,244,1,0,0,0,247,259,1,0,
+        0,0,248,249,10,4,0,0,249,250,7,2,0,0,250,258,3,52,26,5,251,252,10,
+        2,0,0,252,253,5,21,0,0,253,258,3,52,26,3,254,255,10,1,0,0,255,256,
+        5,22,0,0,256,258,3,52,26,2,257,248,1,0,0,0,257,251,1,0,0,0,257,254,
+        1,0,0,0,258,261,1,0,0,0,259,257,1,0,0,0,259,260,1,0,0,0,260,53,1,
+        0,0,0,261,259,1,0,0,0,262,263,7,3,0,0,263,55,1,0,0,0,264,265,6,28,
+        -1,0,265,266,5,35,0,0,266,267,3,56,28,0,267,268,5,36,0,0,268,277,
+        1,0,0,0,269,277,3,44,22,0,270,277,3,42,21,0,271,277,5,43,0,0,272,
+        277,5,44,0,0,273,274,5,25,0,0,274,277,3,56,28,4,275,277,5,46,0,0,
+        276,264,1,0,0,0,276,269,1,0,0,0,276,270,1,0,0,0,276,271,1,0,0,0,
+        276,272,1,0,0,0,276,273,1,0,0,0,276,275,1,0,0,0,277,286,1,0,0,0,
+        278,279,10,3,0,0,279,280,7,4,0,0,280,285,3,56,28,4,281,282,10,2,
+        0,0,282,283,7,5,0,0,283,285,3,56,28,3,284,278,1,0,0,0,284,281,1,
+        0,0,0,285,288,1,0,0,0,286,284,1,0,0,0,286,287,1,0,0,0,287,57,1,0,
+        0,0,288,286,1,0,0,0,26,61,69,77,87,97,105,109,113,121,137,164,173,
+        182,191,193,199,208,216,221,228,246,257,259,276,284,286
     ]
 
 class SigmaScriptParser ( Parser ):
@@ -126,22 +128,23 @@ class SigmaScriptParser ( Parser ):
 
     literalNames = [ "<INVALID>", "'calkowita'", "'rzeczywista'", "'logiczna'", 
                      "'tekst'", "'pusta'", "'struktura'", "'funkcja'", "'zwroc'", 
-                     "'prawda'", "'falsz'", "'naprzod'", "'obroc'", "'powtorz'", 
-                     "'dopoki'", "'jezeli'", "'inaczej'", "'wypisz'", "'ustaw'", 
-                     "'oraz'", "'lub'", "'nie'", "'+'", "'-'", "'*'", "'/'", 
-                     "'='", "'=='", "'!='", "'<='", "'>='", "'<'", "'>'", 
-                     "'('", "')'", "'{'", "'}'", "'['", "']'", "'.'", "','" ]
+                     "'prawda'", "'falsz'", "'naprzod'", "'obroc'", "'podnies'", 
+                     "'opusc'", "'powtorz'", "'dopoki'", "'jezeli'", "'inaczej'", 
+                     "'wypisz'", "'ustaw'", "'oraz'", "'lub'", "'nie'", 
+                     "'+'", "'-'", "'*'", "'/'", "'='", "'=='", "'!='", 
+                     "'<='", "'>='", "'<'", "'>'", "'('", "')'", "'{'", 
+                     "'}'", "'['", "']'", "'.'", "','" ]
 
     symbolicNames = [ "<INVALID>", "CALKOWITA", "RZECZYWISTA", "LOGICZNA", 
                       "TEKST_TYP", "PUSTA", "STRUKTURA", "FUNKCJA", "ZWROC", 
-                      "PRAWDA", "FALSZ", "NAPRZOD", "OBROC", "POWTORZ", 
-                      "DOPOKI", "JEZELI", "INACZEJ", "WYPISZ", "USTAW", 
-                      "ORAZ", "LUB", "NIE", "PLUS", "MINUS", "RAZY", "PRZEZ", 
-                      "PRZYPIS", "ROWNY", "ROZNY", "MNIEJ_ROWN", "WIEC_ROWN", 
-                      "MNIEJSZY", "WIEKSZY", "L_NAWIAS", "P_NAWIAS", "L_KLAMRA", 
-                      "P_KLAMRA", "L_KWADRAT", "P_KWADRAT", "KROPKA", "PRZECINEK", 
-                      "LICZ_CALK", "LICZ_RZECZ", "IDENT", "TEKST", "WS", 
-                      "COMMENT" ]
+                      "PRAWDA", "FALSZ", "NAPRZOD", "OBROC", "PODNIES", 
+                      "OPUSC", "POWTORZ", "DOPOKI", "JEZELI", "INACZEJ", 
+                      "WYPISZ", "USTAW", "ORAZ", "LUB", "NIE", "PLUS", "MINUS", 
+                      "RAZY", "PRZEZ", "PRZYPIS", "ROWNY", "ROZNY", "MNIEJ_ROWN", 
+                      "WIEC_ROWN", "MNIEJSZY", "WIEKSZY", "L_NAWIAS", "P_NAWIAS", 
+                      "L_KLAMRA", "P_KLAMRA", "L_KWADRAT", "P_KWADRAT", 
+                      "KROPKA", "PRZECINEK", "LICZ_CALK", "LICZ_RZECZ", 
+                      "IDENT", "TEKST", "WS", "COMMENT" ]
 
     RULE_program = 0
     RULE_definicja = 1
@@ -156,27 +159,28 @@ class SigmaScriptParser ( Parser ):
     RULE_instrukcja = 10
     RULE_polecenie_ruchu = 11
     RULE_polecenie_obrotu = 12
-    RULE_petla = 13
-    RULE_petla_warunkowa = 14
-    RULE_instrukcja_warunkowa = 15
-    RULE_wypisanie = 16
-    RULE_deklaracja_zmiennej = 17
-    RULE_przypisanie = 18
-    RULE_instrukcja_zwrotu = 19
-    RULE_odwolanie = 20
-    RULE_wywolanie_funkcji = 21
-    RULE_argumenty = 22
-    RULE_inicjalizacja_tablicy = 23
-    RULE_wyrazenie_ogolne = 24
-    RULE_wyrazenie_logiczne = 25
-    RULE_operator_rel = 26
-    RULE_wyrazenie_arytmetyczne = 27
+    RULE_polecenie_pisaka = 13
+    RULE_petla = 14
+    RULE_petla_warunkowa = 15
+    RULE_instrukcja_warunkowa = 16
+    RULE_wypisanie = 17
+    RULE_deklaracja_zmiennej = 18
+    RULE_przypisanie = 19
+    RULE_instrukcja_zwrotu = 20
+    RULE_odwolanie = 21
+    RULE_wywolanie_funkcji = 22
+    RULE_argumenty = 23
+    RULE_inicjalizacja_tablicy = 24
+    RULE_wyrazenie_ogolne = 25
+    RULE_wyrazenie_logiczne = 26
+    RULE_operator_rel = 27
+    RULE_wyrazenie_arytmetyczne = 28
 
     ruleNames =  [ "program", "definicja", "definicja_struktury", "definicja_funkcji", 
                    "parametry", "parametr", "typ_zwracany", "typ", "wymiar_tablicy", 
                    "blok_kodu", "instrukcja", "polecenie_ruchu", "polecenie_obrotu", 
-                   "petla", "petla_warunkowa", "instrukcja_warunkowa", "wypisanie", 
-                   "deklaracja_zmiennej", "przypisanie", "instrukcja_zwrotu", 
+                   "polecenie_pisaka", "petla", "petla_warunkowa", "instrukcja_warunkowa", 
+                   "wypisanie", "deklaracja_zmiennej", "przypisanie", "instrukcja_zwrotu", 
                    "odwolanie", "wywolanie_funkcji", "argumenty", "inicjalizacja_tablicy", 
                    "wyrazenie_ogolne", "wyrazenie_logiczne", "operator_rel", 
                    "wyrazenie_arytmetyczne" ]
@@ -194,40 +198,42 @@ class SigmaScriptParser ( Parser ):
     FALSZ=10
     NAPRZOD=11
     OBROC=12
-    POWTORZ=13
-    DOPOKI=14
-    JEZELI=15
-    INACZEJ=16
-    WYPISZ=17
-    USTAW=18
-    ORAZ=19
-    LUB=20
-    NIE=21
-    PLUS=22
-    MINUS=23
-    RAZY=24
-    PRZEZ=25
-    PRZYPIS=26
-    ROWNY=27
-    ROZNY=28
-    MNIEJ_ROWN=29
-    WIEC_ROWN=30
-    MNIEJSZY=31
-    WIEKSZY=32
-    L_NAWIAS=33
-    P_NAWIAS=34
-    L_KLAMRA=35
-    P_KLAMRA=36
-    L_KWADRAT=37
-    P_KWADRAT=38
-    KROPKA=39
-    PRZECINEK=40
-    LICZ_CALK=41
-    LICZ_RZECZ=42
-    IDENT=43
-    TEKST=44
-    WS=45
-    COMMENT=46
+    PODNIES=13
+    OPUSC=14
+    POWTORZ=15
+    DOPOKI=16
+    JEZELI=17
+    INACZEJ=18
+    WYPISZ=19
+    USTAW=20
+    ORAZ=21
+    LUB=22
+    NIE=23
+    PLUS=24
+    MINUS=25
+    RAZY=26
+    PRZEZ=27
+    PRZYPIS=28
+    ROWNY=29
+    ROZNY=30
+    MNIEJ_ROWN=31
+    WIEC_ROWN=32
+    MNIEJSZY=33
+    WIEKSZY=34
+    L_NAWIAS=35
+    P_NAWIAS=36
+    L_KLAMRA=37
+    P_KLAMRA=38
+    L_KWADRAT=39
+    P_KWADRAT=40
+    KROPKA=41
+    PRZECINEK=42
+    LICZ_CALK=43
+    LICZ_RZECZ=44
+    IDENT=45
+    TEKST=46
+    WS=47
+    COMMENT=48
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
@@ -266,12 +272,6 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitProgram" ):
                 listener.exitProgram(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitProgram" ):
-                return visitor.visitProgram(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
@@ -282,17 +282,17 @@ class SigmaScriptParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 59
+            self.state = 61
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 8796093479390) != 0):
-                self.state = 56
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 35184373922270) != 0):
+                self.state = 58
                 self.definicja()
-                self.state = 61
+                self.state = 63
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
 
-            self.state = 62
+            self.state = 64
             self.match(SigmaScriptParser.EOF)
         except RecognitionException as re:
             localctx.exception = re
@@ -333,12 +333,6 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitDefinicja" ):
                 listener.exitDefinicja(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitDefinicja" ):
-                return visitor.visitDefinicja(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
@@ -347,22 +341,22 @@ class SigmaScriptParser ( Parser ):
         localctx = SigmaScriptParser.DefinicjaContext(self, self._ctx, self.state)
         self.enterRule(localctx, 2, self.RULE_definicja)
         try:
-            self.state = 67
+            self.state = 69
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [1, 2, 3, 4, 8, 11, 12, 13, 14, 15, 17, 18, 43]:
+            if token in [1, 2, 3, 4, 8, 11, 12, 13, 14, 15, 16, 17, 19, 20, 45]:
                 self.enterOuterAlt(localctx, 1)
-                self.state = 64
+                self.state = 66
                 self.instrukcja()
                 pass
             elif token in [6]:
                 self.enterOuterAlt(localctx, 2)
-                self.state = 65
+                self.state = 67
                 self.definicja_struktury()
                 pass
             elif token in [7]:
                 self.enterOuterAlt(localctx, 3)
-                self.state = 66
+                self.state = 68
                 self.definicja_funkcji()
                 pass
             else:
@@ -414,12 +408,6 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitDefinicja_struktury" ):
                 listener.exitDefinicja_struktury(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitDefinicja_struktury" ):
-                return visitor.visitDefinicja_struktury(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
@@ -430,23 +418,23 @@ class SigmaScriptParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 69
-            self.match(SigmaScriptParser.STRUKTURA)
-            self.state = 70
-            self.match(SigmaScriptParser.IDENT)
             self.state = 71
+            self.match(SigmaScriptParser.STRUKTURA)
+            self.state = 72
+            self.match(SigmaScriptParser.IDENT)
+            self.state = 73
             self.match(SigmaScriptParser.L_KLAMRA)
-            self.state = 75
+            self.state = 77
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 8796093022238) != 0):
-                self.state = 72
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 35184372088862) != 0):
+                self.state = 74
                 self.deklaracja_zmiennej()
-                self.state = 77
+                self.state = 79
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
 
-            self.state = 78
+            self.state = 80
             self.match(SigmaScriptParser.P_KLAMRA)
         except RecognitionException as re:
             localctx.exception = re
@@ -499,12 +487,6 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitDefinicja_funkcji" ):
                 listener.exitDefinicja_funkcji(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitDefinicja_funkcji" ):
-                return visitor.visitDefinicja_funkcji(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
@@ -515,25 +497,25 @@ class SigmaScriptParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 80
-            self.match(SigmaScriptParser.FUNKCJA)
-            self.state = 81
-            self.typ_zwracany()
             self.state = 82
-            self.match(SigmaScriptParser.IDENT)
+            self.match(SigmaScriptParser.FUNKCJA)
             self.state = 83
-            self.match(SigmaScriptParser.L_NAWIAS)
+            self.typ_zwracany()
+            self.state = 84
+            self.match(SigmaScriptParser.IDENT)
             self.state = 85
+            self.match(SigmaScriptParser.L_NAWIAS)
+            self.state = 87
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if (((_la) & ~0x3f) == 0 and ((1 << _la) & 8796093022238) != 0):
-                self.state = 84
+            if (((_la) & ~0x3f) == 0 and ((1 << _la) & 35184372088862) != 0):
+                self.state = 86
                 self.parametry()
 
 
-            self.state = 87
+            self.state = 89
             self.match(SigmaScriptParser.P_NAWIAS)
-            self.state = 88
+            self.state = 90
             self.blok_kodu()
         except RecognitionException as re:
             localctx.exception = re
@@ -575,12 +557,6 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitParametry" ):
                 listener.exitParametry(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitParametry" ):
-                return visitor.visitParametry(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
@@ -591,17 +567,17 @@ class SigmaScriptParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 90
+            self.state = 92
             self.parametr()
-            self.state = 95
+            self.state = 97
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while _la==40:
-                self.state = 91
+            while _la==42:
+                self.state = 93
                 self.match(SigmaScriptParser.PRZECINEK)
-                self.state = 92
+                self.state = 94
                 self.parametr()
-                self.state = 97
+                self.state = 99
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
 
@@ -639,12 +615,6 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitParametr" ):
                 listener.exitParametr(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitParametr" ):
-                return visitor.visitParametr(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
@@ -654,9 +624,9 @@ class SigmaScriptParser ( Parser ):
         self.enterRule(localctx, 10, self.RULE_parametr)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 98
+            self.state = 100
             self.typ()
-            self.state = 99
+            self.state = 101
             self.match(SigmaScriptParser.IDENT)
         except RecognitionException as re:
             localctx.exception = re
@@ -692,12 +662,6 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitTyp_zwracany" ):
                 listener.exitTyp_zwracany(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitTyp_zwracany" ):
-                return visitor.visitTyp_zwracany(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
@@ -706,17 +670,17 @@ class SigmaScriptParser ( Parser ):
         localctx = SigmaScriptParser.Typ_zwracanyContext(self, self._ctx, self.state)
         self.enterRule(localctx, 12, self.RULE_typ_zwracany)
         try:
-            self.state = 103
+            self.state = 105
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [1, 2, 3, 4, 43]:
+            if token in [1, 2, 3, 4, 45]:
                 self.enterOuterAlt(localctx, 1)
-                self.state = 101
+                self.state = 103
                 self.typ()
                 pass
             elif token in [5]:
                 self.enterOuterAlt(localctx, 2)
-                self.state = 102
+                self.state = 104
                 self.match(SigmaScriptParser.PUSTA)
                 pass
             else:
@@ -768,12 +732,6 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitTyp" ):
                 listener.exitTyp(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitTyp" ):
-                return visitor.visitTyp(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
@@ -784,18 +742,18 @@ class SigmaScriptParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 105
+            self.state = 107
             _la = self._input.LA(1)
-            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 8796093022238) != 0)):
+            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 35184372088862) != 0)):
                 self._errHandler.recoverInline(self)
             else:
                 self._errHandler.reportMatch(self)
                 self.consume()
-            self.state = 107
+            self.state = 109
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==37:
-                self.state = 106
+            if _la==39:
+                self.state = 108
                 self.wymiar_tablicy()
 
 
@@ -835,12 +793,6 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitWymiar_tablicy" ):
                 listener.exitWymiar_tablicy(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitWymiar_tablicy" ):
-                return visitor.visitWymiar_tablicy(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
@@ -851,17 +803,17 @@ class SigmaScriptParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 109
-            self.match(SigmaScriptParser.L_KWADRAT)
             self.state = 111
+            self.match(SigmaScriptParser.L_KWADRAT)
+            self.state = 113
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==41:
-                self.state = 110
+            if _la==43:
+                self.state = 112
                 self.match(SigmaScriptParser.LICZ_CALK)
 
 
-            self.state = 113
+            self.state = 115
             self.match(SigmaScriptParser.P_KWADRAT)
         except RecognitionException as re:
             localctx.exception = re
@@ -903,12 +855,6 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitBlok_kodu" ):
                 listener.exitBlok_kodu(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitBlok_kodu" ):
-                return visitor.visitBlok_kodu(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
@@ -919,19 +865,19 @@ class SigmaScriptParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 115
+            self.state = 117
             self.match(SigmaScriptParser.L_KLAMRA)
-            self.state = 119
+            self.state = 121
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 8796093479198) != 0):
-                self.state = 116
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 35184373922078) != 0):
+                self.state = 118
                 self.instrukcja()
-                self.state = 121
+                self.state = 123
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
 
-            self.state = 122
+            self.state = 124
             self.match(SigmaScriptParser.P_KLAMRA)
         except RecognitionException as re:
             localctx.exception = re
@@ -955,6 +901,10 @@ class SigmaScriptParser ( Parser ):
 
         def polecenie_obrotu(self):
             return self.getTypedRuleContext(SigmaScriptParser.Polecenie_obrotuContext,0)
+
+
+        def polecenie_pisaka(self):
+            return self.getTypedRuleContext(SigmaScriptParser.Polecenie_pisakaContext,0)
 
 
         def petla(self):
@@ -1000,12 +950,6 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitInstrukcja" ):
                 listener.exitInstrukcja(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitInstrukcja" ):
-                return visitor.visitInstrukcja(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
@@ -1014,66 +958,72 @@ class SigmaScriptParser ( Parser ):
         localctx = SigmaScriptParser.InstrukcjaContext(self, self._ctx, self.state)
         self.enterRule(localctx, 20, self.RULE_instrukcja)
         try:
-            self.state = 134
+            self.state = 137
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input,9,self._ctx)
             if la_ == 1:
                 self.enterOuterAlt(localctx, 1)
-                self.state = 124
+                self.state = 126
                 self.polecenie_ruchu()
                 pass
 
             elif la_ == 2:
                 self.enterOuterAlt(localctx, 2)
-                self.state = 125
+                self.state = 127
                 self.polecenie_obrotu()
                 pass
 
             elif la_ == 3:
                 self.enterOuterAlt(localctx, 3)
-                self.state = 126
-                self.petla()
+                self.state = 128
+                self.polecenie_pisaka()
                 pass
 
             elif la_ == 4:
                 self.enterOuterAlt(localctx, 4)
-                self.state = 127
-                self.petla_warunkowa()
+                self.state = 129
+                self.petla()
                 pass
 
             elif la_ == 5:
                 self.enterOuterAlt(localctx, 5)
-                self.state = 128
-                self.instrukcja_warunkowa()
+                self.state = 130
+                self.petla_warunkowa()
                 pass
 
             elif la_ == 6:
                 self.enterOuterAlt(localctx, 6)
-                self.state = 129
-                self.wypisanie()
+                self.state = 131
+                self.instrukcja_warunkowa()
                 pass
 
             elif la_ == 7:
                 self.enterOuterAlt(localctx, 7)
-                self.state = 130
-                self.deklaracja_zmiennej()
+                self.state = 132
+                self.wypisanie()
                 pass
 
             elif la_ == 8:
                 self.enterOuterAlt(localctx, 8)
-                self.state = 131
-                self.przypisanie()
+                self.state = 133
+                self.deklaracja_zmiennej()
                 pass
 
             elif la_ == 9:
                 self.enterOuterAlt(localctx, 9)
-                self.state = 132
-                self.instrukcja_zwrotu()
+                self.state = 134
+                self.przypisanie()
                 pass
 
             elif la_ == 10:
                 self.enterOuterAlt(localctx, 10)
-                self.state = 133
+                self.state = 135
+                self.instrukcja_zwrotu()
+                pass
+
+            elif la_ == 11:
+                self.enterOuterAlt(localctx, 11)
+                self.state = 136
                 self.wywolanie_funkcji()
                 pass
 
@@ -1112,12 +1062,6 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitPolecenie_ruchu" ):
                 listener.exitPolecenie_ruchu(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitPolecenie_ruchu" ):
-                return visitor.visitPolecenie_ruchu(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
@@ -1127,9 +1071,9 @@ class SigmaScriptParser ( Parser ):
         self.enterRule(localctx, 22, self.RULE_polecenie_ruchu)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 136
+            self.state = 139
             self.match(SigmaScriptParser.NAPRZOD)
-            self.state = 137
+            self.state = 140
             self.wyrazenie_arytmetyczne(0)
         except RecognitionException as re:
             localctx.exception = re
@@ -1165,12 +1109,6 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitPolecenie_obrotu" ):
                 listener.exitPolecenie_obrotu(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitPolecenie_obrotu" ):
-                return visitor.visitPolecenie_obrotu(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
@@ -1180,10 +1118,60 @@ class SigmaScriptParser ( Parser ):
         self.enterRule(localctx, 24, self.RULE_polecenie_obrotu)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 139
+            self.state = 142
             self.match(SigmaScriptParser.OBROC)
-            self.state = 140
+            self.state = 143
             self.wyrazenie_arytmetyczne(0)
+        except RecognitionException as re:
+            localctx.exception = re
+            self._errHandler.reportError(self, re)
+            self._errHandler.recover(self, re)
+        finally:
+            self.exitRule()
+        return localctx
+
+
+    class Polecenie_pisakaContext(ParserRuleContext):
+        __slots__ = 'parser'
+
+        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
+            super().__init__(parent, invokingState)
+            self.parser = parser
+
+        def PODNIES(self):
+            return self.getToken(SigmaScriptParser.PODNIES, 0)
+
+        def OPUSC(self):
+            return self.getToken(SigmaScriptParser.OPUSC, 0)
+
+        def getRuleIndex(self):
+            return SigmaScriptParser.RULE_polecenie_pisaka
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterPolecenie_pisaka" ):
+                listener.enterPolecenie_pisaka(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitPolecenie_pisaka" ):
+                listener.exitPolecenie_pisaka(self)
+
+
+
+
+    def polecenie_pisaka(self):
+
+        localctx = SigmaScriptParser.Polecenie_pisakaContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 26, self.RULE_polecenie_pisaka)
+        self._la = 0 # Token type
+        try:
+            self.enterOuterAlt(localctx, 1)
+            self.state = 145
+            _la = self._input.LA(1)
+            if not(_la==13 or _la==14):
+                self._errHandler.recoverInline(self)
+            else:
+                self._errHandler.reportMatch(self)
+                self.consume()
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -1222,26 +1210,20 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitPetla" ):
                 listener.exitPetla(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitPetla" ):
-                return visitor.visitPetla(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
     def petla(self):
 
         localctx = SigmaScriptParser.PetlaContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 26, self.RULE_petla)
+        self.enterRule(localctx, 28, self.RULE_petla)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 142
+            self.state = 147
             self.match(SigmaScriptParser.POWTORZ)
-            self.state = 143
+            self.state = 148
             self.wyrazenie_arytmetyczne(0)
-            self.state = 144
+            self.state = 149
             self.blok_kodu()
         except RecognitionException as re:
             localctx.exception = re
@@ -1287,30 +1269,24 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitPetla_warunkowa" ):
                 listener.exitPetla_warunkowa(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitPetla_warunkowa" ):
-                return visitor.visitPetla_warunkowa(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
     def petla_warunkowa(self):
 
         localctx = SigmaScriptParser.Petla_warunkowaContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 28, self.RULE_petla_warunkowa)
+        self.enterRule(localctx, 30, self.RULE_petla_warunkowa)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 146
+            self.state = 151
             self.match(SigmaScriptParser.DOPOKI)
-            self.state = 147
+            self.state = 152
             self.match(SigmaScriptParser.L_NAWIAS)
-            self.state = 148
+            self.state = 153
             self.wyrazenie_logiczne(0)
-            self.state = 149
+            self.state = 154
             self.match(SigmaScriptParser.P_NAWIAS)
-            self.state = 150
+            self.state = 155
             self.blok_kodu()
         except RecognitionException as re:
             localctx.exception = re
@@ -1362,39 +1338,33 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitInstrukcja_warunkowa" ):
                 listener.exitInstrukcja_warunkowa(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitInstrukcja_warunkowa" ):
-                return visitor.visitInstrukcja_warunkowa(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
     def instrukcja_warunkowa(self):
 
         localctx = SigmaScriptParser.Instrukcja_warunkowaContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 30, self.RULE_instrukcja_warunkowa)
+        self.enterRule(localctx, 32, self.RULE_instrukcja_warunkowa)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 152
+            self.state = 157
             self.match(SigmaScriptParser.JEZELI)
-            self.state = 153
+            self.state = 158
             self.match(SigmaScriptParser.L_NAWIAS)
-            self.state = 154
-            self.wyrazenie_logiczne(0)
-            self.state = 155
-            self.match(SigmaScriptParser.P_NAWIAS)
-            self.state = 156
-            self.blok_kodu()
             self.state = 159
+            self.wyrazenie_logiczne(0)
+            self.state = 160
+            self.match(SigmaScriptParser.P_NAWIAS)
+            self.state = 161
+            self.blok_kodu()
+            self.state = 164
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==16:
-                self.state = 157
+            if _la==18:
+                self.state = 162
                 self.match(SigmaScriptParser.INACZEJ)
-                self.state = 158
+                self.state = 163
                 self.blok_kodu()
 
 
@@ -1432,24 +1402,18 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitWypisanie" ):
                 listener.exitWypisanie(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitWypisanie" ):
-                return visitor.visitWypisanie(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
     def wypisanie(self):
 
         localctx = SigmaScriptParser.WypisanieContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 32, self.RULE_wypisanie)
+        self.enterRule(localctx, 34, self.RULE_wypisanie)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 161
+            self.state = 166
             self.match(SigmaScriptParser.WYPISZ)
-            self.state = 162
+            self.state = 167
             self.wyrazenie_ogolne()
         except RecognitionException as re:
             localctx.exception = re
@@ -1492,33 +1456,27 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitDeklaracja_zmiennej" ):
                 listener.exitDeklaracja_zmiennej(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitDeklaracja_zmiennej" ):
-                return visitor.visitDeklaracja_zmiennej(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
     def deklaracja_zmiennej(self):
 
         localctx = SigmaScriptParser.Deklaracja_zmiennejContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 34, self.RULE_deklaracja_zmiennej)
+        self.enterRule(localctx, 36, self.RULE_deklaracja_zmiennej)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 164
+            self.state = 169
             self.typ()
-            self.state = 165
+            self.state = 170
             self.match(SigmaScriptParser.IDENT)
-            self.state = 168
+            self.state = 173
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==26:
-                self.state = 166
+            if _la==28:
+                self.state = 171
                 self.match(SigmaScriptParser.PRZYPIS)
-                self.state = 167
+                self.state = 172
                 self.wyrazenie_ogolne()
 
 
@@ -1563,28 +1521,22 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitPrzypisanie" ):
                 listener.exitPrzypisanie(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitPrzypisanie" ):
-                return visitor.visitPrzypisanie(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
     def przypisanie(self):
 
         localctx = SigmaScriptParser.PrzypisanieContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 36, self.RULE_przypisanie)
+        self.enterRule(localctx, 38, self.RULE_przypisanie)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 170
+            self.state = 175
             self.match(SigmaScriptParser.USTAW)
-            self.state = 171
+            self.state = 176
             self.odwolanie()
-            self.state = 172
+            self.state = 177
             self.match(SigmaScriptParser.PRZYPIS)
-            self.state = 173
+            self.state = 178
             self.wyrazenie_ogolne()
         except RecognitionException as re:
             localctx.exception = re
@@ -1620,28 +1572,22 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitInstrukcja_zwrotu" ):
                 listener.exitInstrukcja_zwrotu(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitInstrukcja_zwrotu" ):
-                return visitor.visitInstrukcja_zwrotu(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
     def instrukcja_zwrotu(self):
 
         localctx = SigmaScriptParser.Instrukcja_zwrotuContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 38, self.RULE_instrukcja_zwrotu)
+        self.enterRule(localctx, 40, self.RULE_instrukcja_zwrotu)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 175
+            self.state = 180
             self.match(SigmaScriptParser.ZWROC)
-            self.state = 177
+            self.state = 182
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input,12,self._ctx)
             if la_ == 1:
-                self.state = 176
+                self.state = 181
                 self.wyrazenie_ogolne()
 
 
@@ -1703,49 +1649,43 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitOdwolanie" ):
                 listener.exitOdwolanie(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitOdwolanie" ):
-                return visitor.visitOdwolanie(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
     def odwolanie(self):
 
         localctx = SigmaScriptParser.OdwolanieContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 40, self.RULE_odwolanie)
+        self.enterRule(localctx, 42, self.RULE_odwolanie)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 179
+            self.state = 184
             self.match(SigmaScriptParser.IDENT)
-            self.state = 188
+            self.state = 193
             self._errHandler.sync(self)
             _alt = self._interp.adaptivePredict(self._input,14,self._ctx)
             while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
                 if _alt==1:
-                    self.state = 186
+                    self.state = 191
                     self._errHandler.sync(self)
                     token = self._input.LA(1)
-                    if token in [37]:
-                        self.state = 180
+                    if token in [39]:
+                        self.state = 185
                         self.match(SigmaScriptParser.L_KWADRAT)
-                        self.state = 181
+                        self.state = 186
                         self.wyrazenie_arytmetyczne(0)
-                        self.state = 182
+                        self.state = 187
                         self.match(SigmaScriptParser.P_KWADRAT)
                         pass
-                    elif token in [39]:
-                        self.state = 184
+                    elif token in [41]:
+                        self.state = 189
                         self.match(SigmaScriptParser.KROPKA)
-                        self.state = 185
+                        self.state = 190
                         self.match(SigmaScriptParser.IDENT)
                         pass
                     else:
                         raise NoViableAltException(self)
              
-                self.state = 190
+                self.state = 195
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,14,self._ctx)
 
@@ -1808,48 +1748,42 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitWywolanie_funkcji" ):
                 listener.exitWywolanie_funkcji(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitWywolanie_funkcji" ):
-                return visitor.visitWywolanie_funkcji(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
     def wywolanie_funkcji(self):
 
         localctx = SigmaScriptParser.Wywolanie_funkcjiContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 42, self.RULE_wywolanie_funkcji)
+        self.enterRule(localctx, 44, self.RULE_wywolanie_funkcji)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 191
+            self.state = 196
             self.match(SigmaScriptParser.IDENT)
-            self.state = 192
+            self.state = 197
             self.match(SigmaScriptParser.L_NAWIAS)
-            self.state = 194
+            self.state = 199
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if (((_la) & ~0x3f) == 0 and ((1 << _la) & 33131388208640) != 0):
-                self.state = 193
+            if (((_la) & ~0x3f) == 0 and ((1 << _la) & 132525552829952) != 0):
+                self.state = 198
                 self.argumenty()
 
 
-            self.state = 196
+            self.state = 201
             self.match(SigmaScriptParser.P_NAWIAS)
-            self.state = 203
+            self.state = 208
             self._errHandler.sync(self)
             _alt = self._interp.adaptivePredict(self._input,16,self._ctx)
             while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
                 if _alt==1:
-                    self.state = 197
+                    self.state = 202
                     self.match(SigmaScriptParser.L_KWADRAT)
-                    self.state = 198
+                    self.state = 203
                     self.wyrazenie_arytmetyczne(0)
-                    self.state = 199
+                    self.state = 204
                     self.match(SigmaScriptParser.P_KWADRAT) 
-                self.state = 205
+                self.state = 210
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,16,self._ctx)
 
@@ -1893,33 +1827,27 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitArgumenty" ):
                 listener.exitArgumenty(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitArgumenty" ):
-                return visitor.visitArgumenty(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
     def argumenty(self):
 
         localctx = SigmaScriptParser.ArgumentyContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 44, self.RULE_argumenty)
+        self.enterRule(localctx, 46, self.RULE_argumenty)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 206
-            self.wyrazenie_ogolne()
             self.state = 211
+            self.wyrazenie_ogolne()
+            self.state = 216
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while _la==40:
-                self.state = 207
+            while _la==42:
+                self.state = 212
                 self.match(SigmaScriptParser.PRZECINEK)
-                self.state = 208
-                self.wyrazenie_ogolne()
                 self.state = 213
+                self.wyrazenie_ogolne()
+                self.state = 218
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
 
@@ -1960,33 +1888,27 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitInicjalizacja_tablicy" ):
                 listener.exitInicjalizacja_tablicy(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitInicjalizacja_tablicy" ):
-                return visitor.visitInicjalizacja_tablicy(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
     def inicjalizacja_tablicy(self):
 
         localctx = SigmaScriptParser.Inicjalizacja_tablicyContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 46, self.RULE_inicjalizacja_tablicy)
+        self.enterRule(localctx, 48, self.RULE_inicjalizacja_tablicy)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 214
+            self.state = 219
             self.match(SigmaScriptParser.L_KWADRAT)
-            self.state = 216
+            self.state = 221
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if (((_la) & ~0x3f) == 0 and ((1 << _la) & 33131388208640) != 0):
-                self.state = 215
+            if (((_la) & ~0x3f) == 0 and ((1 << _la) & 132525552829952) != 0):
+                self.state = 220
                 self.argumenty()
 
 
-            self.state = 218
+            self.state = 223
             self.match(SigmaScriptParser.P_KWADRAT)
         except RecognitionException as re:
             localctx.exception = re
@@ -2027,38 +1949,32 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitWyrazenie_ogolne" ):
                 listener.exitWyrazenie_ogolne(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitWyrazenie_ogolne" ):
-                return visitor.visitWyrazenie_ogolne(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
     def wyrazenie_ogolne(self):
 
         localctx = SigmaScriptParser.Wyrazenie_ogolneContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 48, self.RULE_wyrazenie_ogolne)
+        self.enterRule(localctx, 50, self.RULE_wyrazenie_ogolne)
         try:
-            self.state = 223
+            self.state = 228
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input,19,self._ctx)
             if la_ == 1:
                 self.enterOuterAlt(localctx, 1)
-                self.state = 220
+                self.state = 225
                 self.wyrazenie_arytmetyczne(0)
                 pass
 
             elif la_ == 2:
                 self.enterOuterAlt(localctx, 2)
-                self.state = 221
+                self.state = 226
                 self.wyrazenie_logiczne(0)
                 pass
 
             elif la_ == 3:
                 self.enterOuterAlt(localctx, 3)
-                self.state = 222
+                self.state = 227
                 self.inicjalizacja_tablicy()
                 pass
 
@@ -2146,12 +2062,6 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitWyrazenie_logiczne" ):
                 listener.exitWyrazenie_logiczne(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitWyrazenie_logiczne" ):
-                return visitor.visitWyrazenie_logiczne(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
     def wyrazenie_logiczne(self, _p:int=0):
@@ -2159,67 +2069,67 @@ class SigmaScriptParser ( Parser ):
         _parentState = self.state
         localctx = SigmaScriptParser.Wyrazenie_logiczneContext(self, self._ctx, _parentState)
         _prevctx = localctx
-        _startState = 50
-        self.enterRecursionRule(localctx, 50, self.RULE_wyrazenie_logiczne, _p)
+        _startState = 52
+        self.enterRecursionRule(localctx, 52, self.RULE_wyrazenie_logiczne, _p)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 241
+            self.state = 246
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input,20,self._ctx)
             if la_ == 1:
-                self.state = 226
+                self.state = 231
                 self.match(SigmaScriptParser.L_NAWIAS)
-                self.state = 227
+                self.state = 232
                 self.wyrazenie_logiczne(0)
-                self.state = 228
+                self.state = 233
                 self.match(SigmaScriptParser.P_NAWIAS)
                 pass
 
             elif la_ == 2:
-                self.state = 230
+                self.state = 235
                 self.match(SigmaScriptParser.PRAWDA)
                 pass
 
             elif la_ == 3:
-                self.state = 231
+                self.state = 236
                 self.match(SigmaScriptParser.FALSZ)
                 pass
 
             elif la_ == 4:
-                self.state = 232
+                self.state = 237
                 self.match(SigmaScriptParser.TEKST)
                 pass
 
             elif la_ == 5:
-                self.state = 233
+                self.state = 238
                 self.wywolanie_funkcji()
                 pass
 
             elif la_ == 6:
-                self.state = 234
+                self.state = 239
                 self.odwolanie()
                 pass
 
             elif la_ == 7:
-                self.state = 235
+                self.state = 240
                 self.wyrazenie_arytmetyczne(0)
-                self.state = 236
+                self.state = 241
                 self.operator_rel()
-                self.state = 237
+                self.state = 242
                 self.wyrazenie_arytmetyczne(0)
                 pass
 
             elif la_ == 8:
-                self.state = 239
+                self.state = 244
                 self.match(SigmaScriptParser.NIE)
-                self.state = 240
+                self.state = 245
                 self.wyrazenie_logiczne(3)
                 pass
 
 
             self._ctx.stop = self._input.LT(-1)
-            self.state = 254
+            self.state = 259
             self._errHandler.sync(self)
             _alt = self._interp.adaptivePredict(self._input,22,self._ctx)
             while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
@@ -2227,55 +2137,55 @@ class SigmaScriptParser ( Parser ):
                     if self._parseListeners is not None:
                         self.triggerExitRuleEvent()
                     _prevctx = localctx
-                    self.state = 252
+                    self.state = 257
                     self._errHandler.sync(self)
                     la_ = self._interp.adaptivePredict(self._input,21,self._ctx)
                     if la_ == 1:
                         localctx = SigmaScriptParser.Wyrazenie_logiczneContext(self, _parentctx, _parentState)
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_wyrazenie_logiczne)
-                        self.state = 243
+                        self.state = 248
                         if not self.precpred(self._ctx, 4):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 4)")
-                        self.state = 244
+                        self.state = 249
                         _la = self._input.LA(1)
-                        if not(_la==27 or _la==28):
+                        if not(_la==29 or _la==30):
                             self._errHandler.recoverInline(self)
                         else:
                             self._errHandler.reportMatch(self)
                             self.consume()
-                        self.state = 245
+                        self.state = 250
                         self.wyrazenie_logiczne(5)
                         pass
 
                     elif la_ == 2:
                         localctx = SigmaScriptParser.Wyrazenie_logiczneContext(self, _parentctx, _parentState)
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_wyrazenie_logiczne)
-                        self.state = 246
+                        self.state = 251
                         if not self.precpred(self._ctx, 2):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 2)")
-                        self.state = 247
+                        self.state = 252
                         self.match(SigmaScriptParser.ORAZ)
-                        self.state = 248
+                        self.state = 253
                         self.wyrazenie_logiczne(3)
                         pass
 
                     elif la_ == 3:
                         localctx = SigmaScriptParser.Wyrazenie_logiczneContext(self, _parentctx, _parentState)
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_wyrazenie_logiczne)
-                        self.state = 249
+                        self.state = 254
                         if not self.precpred(self._ctx, 1):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 1)")
-                        self.state = 250
+                        self.state = 255
                         self.match(SigmaScriptParser.LUB)
-                        self.state = 251
+                        self.state = 256
                         self.wyrazenie_logiczne(2)
                         pass
 
              
-                self.state = 256
+                self.state = 261
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,22,self._ctx)
 
@@ -2324,25 +2234,19 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitOperator_rel" ):
                 listener.exitOperator_rel(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitOperator_rel" ):
-                return visitor.visitOperator_rel(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
     def operator_rel(self):
 
         localctx = SigmaScriptParser.Operator_relContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 52, self.RULE_operator_rel)
+        self.enterRule(localctx, 54, self.RULE_operator_rel)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 257
+            self.state = 262
             _la = self._input.LA(1)
-            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 8455716864) != 0)):
+            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 33822867456) != 0)):
                 self._errHandler.recoverInline(self)
             else:
                 self._errHandler.reportMatch(self)
@@ -2416,12 +2320,6 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitWyrazenie_arytmetyczne" ):
                 listener.exitWyrazenie_arytmetyczne(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitWyrazenie_arytmetyczne" ):
-                return visitor.visitWyrazenie_arytmetyczne(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
     def wyrazenie_arytmetyczne(self, _p:int=0):
@@ -2429,58 +2327,58 @@ class SigmaScriptParser ( Parser ):
         _parentState = self.state
         localctx = SigmaScriptParser.Wyrazenie_arytmetyczneContext(self, self._ctx, _parentState)
         _prevctx = localctx
-        _startState = 54
-        self.enterRecursionRule(localctx, 54, self.RULE_wyrazenie_arytmetyczne, _p)
+        _startState = 56
+        self.enterRecursionRule(localctx, 56, self.RULE_wyrazenie_arytmetyczne, _p)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 271
+            self.state = 276
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input,23,self._ctx)
             if la_ == 1:
-                self.state = 260
+                self.state = 265
                 self.match(SigmaScriptParser.L_NAWIAS)
-                self.state = 261
+                self.state = 266
                 self.wyrazenie_arytmetyczne(0)
-                self.state = 262
+                self.state = 267
                 self.match(SigmaScriptParser.P_NAWIAS)
                 pass
 
             elif la_ == 2:
-                self.state = 264
+                self.state = 269
                 self.wywolanie_funkcji()
                 pass
 
             elif la_ == 3:
-                self.state = 265
+                self.state = 270
                 self.odwolanie()
                 pass
 
             elif la_ == 4:
-                self.state = 266
+                self.state = 271
                 self.match(SigmaScriptParser.LICZ_CALK)
                 pass
 
             elif la_ == 5:
-                self.state = 267
+                self.state = 272
                 self.match(SigmaScriptParser.LICZ_RZECZ)
                 pass
 
             elif la_ == 6:
-                self.state = 268
+                self.state = 273
                 self.match(SigmaScriptParser.MINUS)
-                self.state = 269
+                self.state = 274
                 self.wyrazenie_arytmetyczne(4)
                 pass
 
             elif la_ == 7:
-                self.state = 270
+                self.state = 275
                 self.match(SigmaScriptParser.TEKST)
                 pass
 
 
             self._ctx.stop = self._input.LT(-1)
-            self.state = 281
+            self.state = 286
             self._errHandler.sync(self)
             _alt = self._interp.adaptivePredict(self._input,25,self._ctx)
             while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
@@ -2488,47 +2386,47 @@ class SigmaScriptParser ( Parser ):
                     if self._parseListeners is not None:
                         self.triggerExitRuleEvent()
                     _prevctx = localctx
-                    self.state = 279
+                    self.state = 284
                     self._errHandler.sync(self)
                     la_ = self._interp.adaptivePredict(self._input,24,self._ctx)
                     if la_ == 1:
                         localctx = SigmaScriptParser.Wyrazenie_arytmetyczneContext(self, _parentctx, _parentState)
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_wyrazenie_arytmetyczne)
-                        self.state = 273
+                        self.state = 278
                         if not self.precpred(self._ctx, 3):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 3)")
-                        self.state = 274
+                        self.state = 279
                         _la = self._input.LA(1)
-                        if not(_la==24 or _la==25):
+                        if not(_la==26 or _la==27):
                             self._errHandler.recoverInline(self)
                         else:
                             self._errHandler.reportMatch(self)
                             self.consume()
-                        self.state = 275
+                        self.state = 280
                         self.wyrazenie_arytmetyczne(4)
                         pass
 
                     elif la_ == 2:
                         localctx = SigmaScriptParser.Wyrazenie_arytmetyczneContext(self, _parentctx, _parentState)
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_wyrazenie_arytmetyczne)
-                        self.state = 276
+                        self.state = 281
                         if not self.precpred(self._ctx, 2):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 2)")
-                        self.state = 277
+                        self.state = 282
                         _la = self._input.LA(1)
-                        if not(_la==22 or _la==23):
+                        if not(_la==24 or _la==25):
                             self._errHandler.recoverInline(self)
                         else:
                             self._errHandler.reportMatch(self)
                             self.consume()
-                        self.state = 278
+                        self.state = 283
                         self.wyrazenie_arytmetyczne(3)
                         pass
 
              
-                self.state = 283
+                self.state = 288
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,25,self._ctx)
 
@@ -2545,8 +2443,8 @@ class SigmaScriptParser ( Parser ):
     def sempred(self, localctx:RuleContext, ruleIndex:int, predIndex:int):
         if self._predicates == None:
             self._predicates = dict()
-        self._predicates[25] = self.wyrazenie_logiczne_sempred
-        self._predicates[27] = self.wyrazenie_arytmetyczne_sempred
+        self._predicates[26] = self.wyrazenie_logiczne_sempred
+        self._predicates[28] = self.wyrazenie_arytmetyczne_sempred
         pred = self._predicates.get(ruleIndex, None)
         if pred is None:
             raise Exception("No predicate with index:" + str(ruleIndex))
