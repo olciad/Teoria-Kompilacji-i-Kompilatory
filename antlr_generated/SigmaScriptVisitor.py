@@ -74,6 +74,11 @@ class SigmaScriptVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SigmaScriptParser#polecenie_pisaka.
+    def visitPolecenie_pisaka(self, ctx:SigmaScriptParser.Polecenie_pisakaContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SigmaScriptParser#petla.
     def visitPetla(self, ctx:SigmaScriptParser.PetlaContext):
         return self.visitChildren(ctx)

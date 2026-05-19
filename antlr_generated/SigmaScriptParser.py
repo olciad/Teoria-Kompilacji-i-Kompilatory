@@ -272,6 +272,12 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitProgram" ):
                 listener.exitProgram(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitProgram" ):
+                return visitor.visitProgram(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -332,6 +338,12 @@ class SigmaScriptParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitDefinicja" ):
                 listener.exitDefinicja(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDefinicja" ):
+                return visitor.visitDefinicja(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -407,6 +419,12 @@ class SigmaScriptParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitDefinicja_struktury" ):
                 listener.exitDefinicja_struktury(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDefinicja_struktury" ):
+                return visitor.visitDefinicja_struktury(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -487,6 +505,12 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitDefinicja_funkcji" ):
                 listener.exitDefinicja_funkcji(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDefinicja_funkcji" ):
+                return visitor.visitDefinicja_funkcji(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -557,6 +581,12 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitParametry" ):
                 listener.exitParametry(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitParametry" ):
+                return visitor.visitParametry(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -615,6 +645,12 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitParametr" ):
                 listener.exitParametr(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitParametr" ):
+                return visitor.visitParametr(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -661,6 +697,12 @@ class SigmaScriptParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitTyp_zwracany" ):
                 listener.exitTyp_zwracany(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitTyp_zwracany" ):
+                return visitor.visitTyp_zwracany(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -732,6 +774,12 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitTyp" ):
                 listener.exitTyp(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitTyp" ):
+                return visitor.visitTyp(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -792,6 +840,12 @@ class SigmaScriptParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitWymiar_tablicy" ):
                 listener.exitWymiar_tablicy(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitWymiar_tablicy" ):
+                return visitor.visitWymiar_tablicy(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -854,6 +908,12 @@ class SigmaScriptParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitBlok_kodu" ):
                 listener.exitBlok_kodu(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitBlok_kodu" ):
+                return visitor.visitBlok_kodu(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -949,6 +1009,12 @@ class SigmaScriptParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitInstrukcja" ):
                 listener.exitInstrukcja(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitInstrukcja" ):
+                return visitor.visitInstrukcja(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1062,6 +1128,12 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitPolecenie_ruchu" ):
                 listener.exitPolecenie_ruchu(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPolecenie_ruchu" ):
+                return visitor.visitPolecenie_ruchu(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1109,6 +1181,12 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitPolecenie_obrotu" ):
                 listener.exitPolecenie_obrotu(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPolecenie_obrotu" ):
+                return visitor.visitPolecenie_obrotu(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1154,6 +1232,12 @@ class SigmaScriptParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitPolecenie_pisaka" ):
                 listener.exitPolecenie_pisaka(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPolecenie_pisaka" ):
+                return visitor.visitPolecenie_pisaka(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1209,6 +1293,12 @@ class SigmaScriptParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitPetla" ):
                 listener.exitPetla(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPetla" ):
+                return visitor.visitPetla(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1268,6 +1358,12 @@ class SigmaScriptParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitPetla_warunkowa" ):
                 listener.exitPetla_warunkowa(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPetla_warunkowa" ):
+                return visitor.visitPetla_warunkowa(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1338,6 +1434,12 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitInstrukcja_warunkowa" ):
                 listener.exitInstrukcja_warunkowa(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitInstrukcja_warunkowa" ):
+                return visitor.visitInstrukcja_warunkowa(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1402,6 +1504,12 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitWypisanie" ):
                 listener.exitWypisanie(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitWypisanie" ):
+                return visitor.visitWypisanie(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1455,6 +1563,12 @@ class SigmaScriptParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitDeklaracja_zmiennej" ):
                 listener.exitDeklaracja_zmiennej(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDeklaracja_zmiennej" ):
+                return visitor.visitDeklaracja_zmiennej(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1521,6 +1635,12 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitPrzypisanie" ):
                 listener.exitPrzypisanie(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPrzypisanie" ):
+                return visitor.visitPrzypisanie(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1571,6 +1691,12 @@ class SigmaScriptParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitInstrukcja_zwrotu" ):
                 listener.exitInstrukcja_zwrotu(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitInstrukcja_zwrotu" ):
+                return visitor.visitInstrukcja_zwrotu(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1648,6 +1774,12 @@ class SigmaScriptParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitOdwolanie" ):
                 listener.exitOdwolanie(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitOdwolanie" ):
+                return visitor.visitOdwolanie(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1748,6 +1880,12 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitWywolanie_funkcji" ):
                 listener.exitWywolanie_funkcji(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitWywolanie_funkcji" ):
+                return visitor.visitWywolanie_funkcji(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1827,6 +1965,12 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitArgumenty" ):
                 listener.exitArgumenty(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitArgumenty" ):
+                return visitor.visitArgumenty(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1888,6 +2032,12 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitInicjalizacja_tablicy" ):
                 listener.exitInicjalizacja_tablicy(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitInicjalizacja_tablicy" ):
+                return visitor.visitInicjalizacja_tablicy(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1948,6 +2098,12 @@ class SigmaScriptParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitWyrazenie_ogolne" ):
                 listener.exitWyrazenie_ogolne(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitWyrazenie_ogolne" ):
+                return visitor.visitWyrazenie_ogolne(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2061,6 +2217,12 @@ class SigmaScriptParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitWyrazenie_logiczne" ):
                 listener.exitWyrazenie_logiczne(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitWyrazenie_logiczne" ):
+                return visitor.visitWyrazenie_logiczne(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2234,6 +2396,12 @@ class SigmaScriptParser ( Parser ):
             if hasattr( listener, "exitOperator_rel" ):
                 listener.exitOperator_rel(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitOperator_rel" ):
+                return visitor.visitOperator_rel(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2319,6 +2487,12 @@ class SigmaScriptParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitWyrazenie_arytmetyczne" ):
                 listener.exitWyrazenie_arytmetyczne(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitWyrazenie_arytmetyczne" ):
+                return visitor.visitWyrazenie_arytmetyczne(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
