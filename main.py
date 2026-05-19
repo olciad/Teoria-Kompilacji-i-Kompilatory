@@ -77,21 +77,69 @@ char* _polacz_teksty(const char* a, const char* b) {
     return wynik;
 }
 
-FILE *svg_file;
-float _x = 500.0; // poczatek na srodku plotna
-float _y = 500.0;
+float _x = 0.0; // teraz startujemy z (0, 0)
+float _y = 0.0;
 float _kat = -90.0; // -90 stopni -- patrzymy w gore
 
+// zmienne sledzace granice rysunku (bounding box)
+float _min_x = 0.0;
+float _max_x = 0.0;
+float _min_y = 0.0;
+float _max_y = 0.0;
+
+// lista kierunkowa do trzymania listy instrukcji
+typedef struct LineNode {
+    float x1, y1, x2, y2;
+    struct LineNode* next;
+} LineNode;
+
+LineNode* _lines_head = NULL;
+LineNode* _lines_tail = NULL;
+
 void _init_svg() {
-    svg_file = fopen("wynik.svg", "w");
-    fprintf(svg_file, "<svg width=\\"1000\\" height=\\"1000\\" xmlns=\\"http://www.w3.org/2000/svg\\">\\n"); //poczatek svg z deklaracja przestrzeni nazw
-    fprintf(svg_file, "<rect width=\\"100%%\\" height=\\"100%%\\" fill=\\"#ffffff\\"/>\\n"); // biale tlo
+    // wartosci startowe
+    _min_x = _x;
+    _max_x = _x;
+    _min_y = _y;
+    _max_y = _y;
 }
 
 void _zapisz_svg() {
+    FILE *svg_file = fopen("wynik.svg", "w");
+    if (!svg_file) return;
+
+    // dodajemy margines
+    float padding = 20.0;
+    float v_min_x = _min_x - padding;
+    float v_min_y = _min_y - padding;
+    float v_width = (_max_x - _min_x) + (padding * 2);
+    float v_height = (_max_y - _min_y) + (padding * 2);
+
+    // zabezpieczenie gdy brak rusunku
+    if (v_width <= 0) v_width = 10;
+    if (v_height <= 0) v_height = 10;
+
+    // tag svg z dynamicznymi wymiarami
+    fprintf(svg_file, "<svg width=\\"%.2f\\" height=\\"%.2f\\" viewBox=\\"%.2f %.2f %.2f %.2f\\" xmlns=\\"http://www.w3.org/2000/svg\\">\\n", v_width, v_height, v_min_x, v_min_y, v_width, v_height);
+    
+    // rysujemy tlo
+    fprintf(svg_file, "<rect x=\\"%.2f\\" y=\\"%.2f\\" width=\\"%.2f\\" height=\\"%.2f\\" fill=\\"#ffffff\\"/>\\n", v_min_x, v_min_y, v_width, v_height);
+
+    // iterujemy po liniach i wrzucamy do pliku
+    LineNode* current = _lines_head;
+    while (current != NULL) {
+        fprintf(svg_file, "<line x1=\\"%.2f\\" y1=\\"%.2f\\" x2=\\"%.2f\\" y2=\\"%.2f\\" stroke=\\"#2c3e50\\" stroke-width=\\"3\\" stroke-linecap=\\"round\\" />\\n",
+                current->x1, current->y1, current->x2, current->y2);
+        
+        // zwalniamy pamiec
+        LineNode* to_free = current;
+        current = current->next;
+        free(to_free);
+    }
+
     fprintf(svg_file, "</svg>\\n");
     fclose(svg_file);
-    _wyczysc_pamiec(); // GC sprzata pamiec z tekstow przed wyjsciem
+    _wyczysc_pamiec();
     printf("[+] Misja zakonczona. Wygenerowano plik wynik.svg!\\n");
 }
 
@@ -100,10 +148,26 @@ void _naprzod(float dystans) {
     float new_x = _x + dystans * cos(rad);
     float new_y = _y + dystans * sin(rad);
 
-    // rysujemy linie w svg
-    fprintf(svg_file, "<line x1=\\"%.2f\\" y1=\\"%.2f\\" x2=\\"%.2f\\" y2=\\"%.2f\\" stroke=\\"#2c3e50\\" stroke-width=\\"3\\" stroke-linecap=\\"round\\" />\\n", _x, _y, new_x, new_y);
+    // wrzucamy linie do pamieci podrecznej 
+    LineNode* node = (LineNode*)malloc(sizeof(LineNode));
+    node->x1 = _x; node->y1 = _y; node->x2 = new_x; node->y2 = new_y;
+    node->next = NULL;
 
-    // aktualizujemy pozycje
+    if (_lines_tail == NULL) {
+        _lines_head = node;
+        _lines_tail = node;
+    } else {
+        _lines_tail->next = node;
+        _lines_tail = node;
+    }
+
+    // sprawdzamy czy nie poszerzylismy granic
+    if (new_x < _min_x) _min_x = new_x;
+    if (new_x > _max_x) _max_x = new_x;
+    if (new_y < _min_y) _min_y = new_y;
+    if (new_y > _max_y) _max_y = new_y;
+
+    // przesuwamy zolwia
     _x = new_x;
     _y = new_y;
 }
