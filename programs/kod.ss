@@ -29,15 +29,13 @@ wypisz "Rozpoczynam misje!"
 
 dopoki (indeks < 4 oraz moj_dron.bateria > 0.0) {
     calkowita krok = trasa[indeks]
-    rzeczywista koszt = 20.0
+    rzeczywista koszt = krok / 2
 
     jezeli (czy_moze_leciec(moj_dron, koszt) == prawda) {
-        // Symulacja np. rysowania kwadratu po przylocie do punktu
-        powtorz 4 {
-            naprzod krok
-            obroc 90
-        }
-        obroc 45 // Zmiana kierunku po kwadracie
+
+        naprzod krok
+        obroc 45
+      
         ustaw moj_dron.bateria = moj_dron.bateria - koszt
     } inaczej {
         ustaw moj_dron.w_powietrzu = falsz
@@ -48,4 +46,9 @@ dopoki (indeks < 4 oraz moj_dron.bateria > 0.0) {
 
 jezeli (moj_dron.w_powietrzu == falsz) {
     wypisz "Koniec baterii!"
+} inaczej {
+    powtorz 4 {
+        naprzod 10
+        obroc 90
+    }
 }
