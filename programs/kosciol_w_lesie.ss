@@ -77,11 +77,11 @@ funkcja pusta slonce(rzeczywista wielkosc) {
     podnies
     naprzod wielkosc
     opusc
-    powtorz 36 {
+    powtorz 24 {
         naprzod wielkosc
         obroc 160.0
         naprzod wielkosc
-        obroc (0.0 - 150.0)
+        obroc -145.0
     }
 }
 
@@ -269,6 +269,6 @@ ptak()
 // Na koniec zawieszamy potężne, geometryczne słońce w lewym górnym rogu
 
 przesun_w_lewo(250.0)
-slonce(18.0)
+slonce(20.0)
 
 wypisz "Scena gotowa! Zobacz na własne oczy wynik.svg!"
