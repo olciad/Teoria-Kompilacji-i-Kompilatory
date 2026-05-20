@@ -331,6 +331,17 @@ class KompilatorVisitor(SigmaScriptVisitor):
         self.bledy_semantyczne = []
         self.czy_zwrocono_wartosc = False
 
+    def zglos_blad(self, ctx, wiadomosc):
+        if ctx and hasattr(ctx, 'start'):
+            linia = ctx.start.line
+            kolumna = ctx.start.column
+            blad = f"[!] Błąd logiczny (linia {linia}, kolumna {kolumna}): {wiadomosc}"
+        else:
+            blad = f"[!] Błąd logiczny: {wiadomosc}"
+
+        if blad not in self.bledy_semantyczne:
+            self.bledy_semantyczne.append(blad)
+
     def dodaj_kod(self, linia):
         if self.w_funkcji:
             self.kod_globalny.append(linia)
@@ -360,9 +371,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
         # jesli zmienna nie istnieje - zglaszamy blad
         if not info_zmiennej:
-            blad = f"[!] Błąd logiczny: Użyto zmiennej '{glowna_zmienna}', która nie została wcześniej zadeklarowana!"
-            if blad not in self.bledy_semantyczne:
-                self.bledy_semantyczne.append(blad)
+            self.zglos_blad(ctx, f"Użyto zmiennej '{glowna_zmienna}', która nie została wcześniej zadeklarowana!")
             return
 
         obecny_typ = info_zmiennej['typ']
@@ -380,8 +389,8 @@ class KompilatorVisitor(SigmaScriptVisitor):
                 elif obecny_typ == 'tekst':
                     pass  # jak tekst to ok
                 else:
-                    blad = f"[!] Błąd logiczny: Próba użycia indeksu '[' na zmiennej '{poprzedni_element}', która nie jest tablicą!"
-                    if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+                    self.zglos_blad(ctx,
+                                    f"Próba użycia indeksu '[' na zmiennej '{poprzedni_element}', która nie jest tablicą!")
                     return
 
             elif znak == ']':
@@ -390,8 +399,8 @@ class KompilatorVisitor(SigmaScriptVisitor):
             elif znak == '.':
                 # proba wywolania pola na calej tablicy
                 if czy_tablica:
-                    blad = f"[!] Błąd logiczny: Próba odwołania do pola struktury z całej tablicy '{poprzedni_element}'. Brakuje indeksu, np. '{poprzedni_element}[0]'!"
-                    if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+                    self.zglos_blad(ctx,
+                                    f"Próba odwołania do pola struktury z całej tablicy '{poprzedni_element}'. Brakuje indeksu, np. '{poprzedni_element}[0]'!")
                     return
 
             elif ctx.getChild(i - 1).getText() == '.':
@@ -400,16 +409,15 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
                 # czy to na pewno struktura
                 if obecny_typ not in self.definicje_struktur:
-                    blad = f"[!] Błąd logiczny: Element '{poprzedni_element}' (typu {obecny_typ}) nie jest strukturą i nie posiada pól!"
-                    if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+                    self.zglos_blad(ctx,
+                                    f"Element '{poprzedni_element}' (typu {obecny_typ}) nie jest strukturą i nie posiada pól!")
                     return
 
                 struktura = self.definicje_struktur[obecny_typ]
 
                 # czy pole istnieje w strukturze
                 if nazwa_pola not in struktura:
-                    blad = f"[!] Błąd logiczny: Struktura '{obecny_typ}' nie posiada pola o nazwie '{nazwa_pola}'!"
-                    if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+                    self.zglos_blad(ctx, f"Struktura '{obecny_typ}' nie posiada pola o nazwie '{nazwa_pola}'!")
                     return
 
                 # aktualizujemy parametry na to czym jest aktualne pole
@@ -433,8 +441,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
             # blokujemy odejmnowanie mnozenie i dzielenie dla tekstow
             if (ctx.MINUS() or ctx.RAZY() or ctx.PRZEZ()) and (typ_lewe == 'tekst' or typ_prawe == 'tekst'):
-                blad = "[!] Błąd logiczny: Nie można odejmować, mnożyć ani dzielić tekstów!"
-                if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+                self.zglos_blad(ctx, "Nie można odejmować, mnożyć ani dzielić tekstów!")
                 return "\"\""  # zwracamy cos
 
             if ctx.PRZEZ():
@@ -452,8 +459,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
                     return f"_polacz_teksty({lewy_kod}, {prawy_kod})"
                 # blokada dodania tekstu do liczby
                 elif typ_lewe == 'tekst' or typ_prawe == 'tekst':
-                    blad = "[!] Błąd logiczny: Nie można dodawać tekstu do liczb!"
-                    if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+                    self.zglos_blad(ctx, "Nie można dodawać tekstu do liczb!")
                     return "\"\""
 
         # porownywanie tekstow z strcmp
@@ -470,9 +476,8 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
                 # jesli typ niebazowy
                 if typ_lewe not in dozwolone_typy or typ_prawe not in dozwolone_typy:
-                    blad = f"[!] Błąd logiczny: Nie można bezpośrednio porównywać tablic ani struktur (próbowano porównać '{typ_lewe}' z '{typ_prawe}'). Porównuj ich konkretne elementy lub pola!"
-                    if blad not in self.bledy_semantyczne:
-                        self.bledy_semantyczne.append(blad)
+                    self.zglos_blad(ctx,
+                                    f"Nie można bezpośrednio porównywać tablic ani struktur (próbowano porównać '{typ_lewe}' z '{typ_prawe}'). Porównuj ich konkretne elementy lub pola!")
                     return "0"
 
                 # rzutujemy == i != na strcmp dla tekstow
@@ -490,16 +495,15 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
             # weryfikacja z uzyciem slownika
             if nazwa_funkcji not in self.zadeklarowane_funkcje:
-                blad = f"[!] Błąd logiczny: Próba wywołania nieznanej funkcji '{nazwa_funkcji}'!"
-                if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+                self.zglos_blad(ctx, f"Próba wywołania nieznanej funkcji '{nazwa_funkcji}'!")
             else:
                 # weryfikacja liczby argumentow
                 lista_argumentow = ctx.argumenty().wyrazenie_ogolne() if ctx.argumenty() else []
                 podane_argumenty = len(lista_argumentow)
                 oczekiwane_argumenty = self.zadeklarowane_funkcje[nazwa_funkcji]['parametry']
                 if podane_argumenty != oczekiwane_argumenty:
-                    blad = f"[!] Błąd logiczny: Funkcja '{nazwa_funkcji}' oczekuje {oczekiwane_argumenty} argumentów, a podano {podane_argumenty}!"
-                    if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+                    self.zglos_blad(ctx,
+                                    f"Funkcja '{nazwa_funkcji}' oczekuje {oczekiwane_argumenty} argumentów, a podano {podane_argumenty}!")
                 else:
                     # weryfikacja typow argumentow w pętli
                     oczekiwane_typy = self.zadeklarowane_funkcje[nazwa_funkcji]['typy_parametrow']
@@ -511,8 +515,8 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
                         # sprawdzamy czy typy sie zgadzaja
                         if podany_typ and oczekiwany_typ and podany_typ != oczekiwany_typ:
-                            blad = f"[!] Błąd logiczny: Niezgodność typów w wywołaniu '{nazwa_funkcji}'. Argument {i + 1} powinien być typu '{oczekiwany_typ}', a jest typu '{podany_typ}'!"
-                            if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+                            self.zglos_blad(ctx,
+                                            f"Niezgodność typów w wywołaniu '{nazwa_funkcji}'. Argument {i + 1} powinien być typu '{oczekiwany_typ}', a jest typu '{podany_typ}'!")
 
         # weryfikacja wywolan pol uzywanych w wyrazeniach
         if isinstance(ctx, SigmaScriptParser.OdwolanieContext):
@@ -677,8 +681,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
                 # zabezpieczenie przed powtorzona nazwa funkcji
                 if nazwa in self.zadeklarowane_funkcje or nazwa in self.definicje_struktur:
-                    self.bledy_semantyczne.append(
-                        f"[!] Błąd logiczny: Nazwa funkcji '{nazwa}' jest już zajęta przez inną strukturę lub funkcję!")
+                    self.zglos_blad(f_ctx, f"Nazwa funkcji '{nazwa}' jest już zajęta przez inną strukturę lub funkcję!")
                 else:
                     typ_zwracany = f_ctx.typ_zwracany().getText()
 
@@ -703,8 +706,8 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
                 # zabezpieczenie przed powtorzona nazwa struktury
                 if nazwa_struktury in self.definicje_struktur or nazwa_struktury in self.zadeklarowane_funkcje:
-                    self.bledy_semantyczne.append(
-                        f"[!] Błąd logiczny: Nazwa struktury '{nazwa_struktury}' jest już zajęta przez inną strukturę lub funkcję!")
+                    self.zglos_blad(s_ctx,
+                                    f"Nazwa struktury '{nazwa_struktury}' jest już zajęta przez inną strukturę lub funkcję!")
                 else:
                     self.definicje_struktur[nazwa_struktury] = {}
                     for dekl in s_ctx.deklaracja_zmiennej():
@@ -829,8 +832,8 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
         # Sprawdzamy czy funkcja (inna niz pusta) miala instrukcje zwroc
         if self.oczekiwany_typ_zwracany != "pusta" and not self.czy_zwrocono_wartosc:
-            blad = f"[!] Błąd logiczny: Funkcja '{nazwa_funkcji}' powinna zwracać typ '{self.oczekiwany_typ_zwracany}', ale brakuje instrukcji 'zwroc'!"
-            if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+            self.zglos_blad(ctx,
+                            f"Funkcja '{nazwa_funkcji}' powinna zwracać typ '{self.oczekiwany_typ_zwracany}', ale brakuje instrukcji 'zwroc'!")
 
         self.oczekiwany_typ_zwracany = None
         self.symbole.wyjdz_z_bloku()
@@ -850,17 +853,17 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
                 # upewniamy sie ze nie zwracamy wartosci z funkcji typu pusta
                 if self.oczekiwany_typ_zwracany == "pusta":
-                    blad = f"[!] Błąd logiczny: Próbujesz zwrócić wartość, ale funkcja została oznaczona jako 'pusta' (niezwracająca niczego)!"
-                    if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+                    self.zglos_blad(ctx,
+                                    "Próbujesz zwrócić wartość, ale funkcja została oznaczona jako 'pusta' (niezwracająca niczego)!")
                 # porownujemy typ deklarowany z faktycznym
                 elif faktyczny_typ != self.oczekiwany_typ_zwracany:
-                    blad = f"[!] Błąd logiczny: Funkcja powinna zwracać typ '{self.oczekiwany_typ_zwracany}', a próbuje zwrócić '{faktyczny_typ}'!"
-                    if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+                    self.zglos_blad(ctx,
+                                    f"Funkcja powinna zwracać typ '{self.oczekiwany_typ_zwracany}', a próbuje zwrócić '{faktyczny_typ}'!")
             else:
                 # puste zwroc w funkcji innej niz pusta
                 if self.oczekiwany_typ_zwracany != "pusta":
-                    blad = f"[!] Błąd logiczny: Użyto instrukcji 'zwroc;' bez podania wartości, mimo że funkcja wymaga typu '{self.oczekiwany_typ_zwracany}'!"
-                    if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+                    self.zglos_blad(ctx,
+                                    f"Użyto instrukcji 'zwroc;' bez podania wartości, mimo że funkcja wymaga typu '{self.oczekiwany_typ_zwracany}'!")
 
         if not self.w_funkcji:
             # jestesmy w programie glownym wiec zapisujemy plik svg przed wyjsciem
@@ -894,8 +897,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
         # sprawdzenie czy zmienna juz istnieje
         sukces = self.symbole.dodaj_zmienna(nazwa, typ_bazowy, czy_tablica)
         if not sukces:
-            blad = f"[!] Błąd logiczny: Zmienna '{nazwa}' jest już zadeklarowana w tym bloku kodu!"
-            self.bledy_semantyczne.append(blad)
+            self.zglos_blad(ctx, f"Zmienna '{nazwa}' jest już zadeklarowana w tym bloku kodu!")
             return None
 
         typ_c = self.rozpoznawanie_typow(typ_bazowy)
@@ -914,8 +916,8 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
         # walidacja pustych tablic
         if wymiar == "[]" and not wartosc_c:
-            blad = f"[!] Błąd logiczny: Tablica '{nazwa}' musi mieć z góry określony rozmiar (np. calkowita[10] {nazwa}) lub zostać natychmiast zainicjowana wartościami!"
-            self.bledy_semantyczne.append(blad)
+            self.zglos_blad(ctx,
+                            f"Tablica '{nazwa}' musi mieć z góry określony rozmiar (np. calkowita[10] {nazwa}) lub zostać natychmiast zainicjowana wartościami!")
             return None
 
         print(f"[Kompilator] Deklaracja zmiennej: {nazwa} ({typ_c})")
@@ -973,8 +975,7 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
         #sprawdzamy czy zmienna istnieje
         if typ_zmiennej is None:
-            blad = f"[!] Błąd logiczny: Próbujesz zmienić wartość '{glowna_zmienna}', ale taka zmienna nie istnieje!"
-            if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+            self.zglos_blad(ctx, f"Próbujesz zmienić wartość '{glowna_zmienna}', ale taka zmienna nie istnieje!")
             return None
 
         # weryfikacja wywolan pol
@@ -987,14 +988,13 @@ class KompilatorVisitor(SigmaScriptVisitor):
         typ_wyrazenia = self.pobierz_typ_wyrazenia(ctx.wyrazenie_ogolne())
 
         if typ_docelowy and typ_wyrazenia and typ_docelowy != typ_wyrazenia:
-            blad = f"[!] Błąd logiczny: Niezgodność typów! Próba przypisania wartości typu '{typ_wyrazenia}' do zmiennej typu '{typ_docelowy}'."
-            if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+            self.zglos_blad(ctx,
+                            f"Niezgodność typów! Próba przypisania wartości typu '{typ_wyrazenia}' do zmiennej typu '{typ_docelowy}'.")
 
         # blokada przypisywania calej tablicy po deklaracji
         czy_inicjalizacja_tablicy = isinstance(ctx.wyrazenie_ogolne(), SigmaScriptParser.Inicjalizacja_tablicyContext)
         if czy_inicjalizacja_tablicy:
-            blad = f"[!] Błąd logiczny: Nie można przypisać całej nowej tablicy po deklaracji. Zmieniaj pojedyncze elementy!"
-            if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+            self.zglos_blad(ctx, "Nie można przypisać całej nowej tablicy po deklaracji. Zmieniaj pojedyncze elementy!")
             return None
 
         self.dodaj_kod(f"    {pelne_odwolanie} = {wyrazenie_c};")
@@ -1028,8 +1028,8 @@ class KompilatorVisitor(SigmaScriptVisitor):
 
         # zabezpieczenie przed wypisywaniem calych struktur
         if typ_wyrazu in self.definicje_struktur:
-            blad = f"[!] Błąd logiczny: Nie można wypisać całego obiektu typu '{typ_wyrazu}'. Odwołaj się do konkretnego pola tej struktury!"
-            if blad not in self.bledy_semantyczne: self.bledy_semantyczne.append(blad)
+            self.zglos_blad(ctx,
+                            f"Nie można wypisać całego obiektu typu '{typ_wyrazu}'. Odwołaj się do konkretnego pola tej struktury!")
             return None
 
         kod_wyrazu = self.tlumacz_wyrazenie(wyraz)
