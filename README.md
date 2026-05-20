@@ -4,7 +4,7 @@ Aleksandra Dousa: adousa@student.agh.edu.pl
 
 Paweł Czyżewski: czeski@student.agh.edu.pl
 
-# 3. Założenia programu
+# 2. Założenia programu
 ## Ogólne cele programu: 
 Stworzenie prostego, edukacyjnego języka programowania (wzorowanego na LOGO i środowiskach typu micro:bit), przeznaczonego dla dzieci w szkole podstawowej. Język będzie posiadał przyjazną i intuicyjną składnię, mającą na celu obniżenie progu wejścia przy nauce podstaw algorytmiki i logicznego myślenia.
 
@@ -20,7 +20,7 @@ Python
 ## Sposób realizacji skanera/parsera: 
 Użycie generatora skanerów i parserów: ANTLR4 w celu zautomatyzowania procesu analizy leksykalnej i syntaktycznej.
 
-# 4. Przykładowy program
+# 3. Przykładowy program
 
 ```SigmaScript
 // 1. DEKLARACJE STRUKTUR
@@ -106,7 +106,7 @@ jezeli (moj_dron.w_powietrzu == falsz) {
 }
 ```
 
-# 5. Opis Tokenów
+# 4. Opis Tokenów
 
 | **Kategoria** | **Nazwa Tokena** |                          | **Opis**                           |
 | --- |------------------|--------------------------|------------------------------------|
@@ -157,7 +157,7 @@ jezeli (moj_dron.w_powietrzu == falsz) {
 | Ignorowane | BIALE_ZNAKI      | `[ \t\r\n]+`             | Spacje, taby, entery               |
 |  | KOMENTARZ        | `//.*`                   | Komentarze jednolinijkowe          |
 
-# 6. Gramatyka
+# 5. Gramatyka
 Gramatyka została zapisana w notacji generatora ANTLR4 
 (z pominięciem reguł leksykalnych, które opisano w tabeli powyżej).
 
@@ -262,7 +262,7 @@ wyrazenie_arytmetyczne: L_NAWIAS wyrazenie_arytmetyczne P_NAWIAS
                       | TEKST
                       ;
 ```
-# 7. Wymagania wstępne, instalacja i instrukcja obsługi
+# 6. Wymagania wstępne, instalacja i instrukcja obsługi
 
 ## Środowisko Python i ANTLR
 Aby poprawnie wygenerować parser, skompilować kod języka oraz uruchomić program docelowy, wymagane jest następujące oprogramowanie:
@@ -270,15 +270,19 @@ Aby poprawnie wygenerować parser, skompilować kod języka oraz uruchomić prog
 - **Java (JRE/JDK):** Wymagana pod spodem przez narzędzie ANTLR do generowania plików parsera.
 - **antlr4-tools:** Oficjalne narzędzie do generowania klas z plików `.g4`.
 - **antlr4-python3-runtime:** Biblioteka w Pythonie niezbędna do analizy drzewa składniowego (AST) i działania naszego Visitora.
+- **gcc:** kompilator języka C
+
+Aby skorzystać ze środowiska graficznego:
+- **biblioteka PyQt5**
 
 **Instalacja pakietów Python:**
 ```bash
 pip install antlr4-tools antlr4-python3-runtime
 ```
 
-## Instrukcja obsługi
+# 7. Instrukcja obsługi
 
-### Generowanie skanera i parsera
+## Generowanie skanera i parsera
 - wygenerowanie klas Pythona skanera i parsera oraz mechanizmu Visitor:
 ```bash
 antlr4 -Dlanguage=Python3 -visitor SigmaScript.g4 -o antlr_generated
@@ -287,11 +291,34 @@ antlr4 -Dlanguage=Python3 -visitor SigmaScript.g4 -o antlr_generated
 ```bash
 antlr4-parse SigmaScript.g4 program -gui kod.ss
 ```
+## Korzystanie ze środowiska graficznego
+
+### Uruchomienie środowiska graficznego
+
+```bash
+python3 ide.py
+```
+
+### Obsługa środowiska graficznego
+
+Po uruchomieniu środowiska graficznego wyświetli się następujące okno:
+
+<img width="1276" height="897" alt="Screenshot 2026-05-20 111938" src="https://github.com/user-attachments/assets/e0a81ba6-4ef4-4f6b-9aa4-c6e827914f65" />
+
+
+Zawartość środowiska graficznego:
+- Lewe górne okienko służy do pisania kodu w języku SigmaScript.
+- Prawe górne okienko wyświetla wygenerowany obrazek.
+- W lewym dolnym okienku znajdują się błędy kompilacji.
+- W prawym dolnym okienku znajduje się wyjście konsoli.
+- Na samej górze znajduje się zielony przycisk do uruchamiania programu w SigmaScript, który kompiluje kod, pokazuje ewentualne błędy kompilacji, a w przypadku ich braku wyświetla obrazek oraz wyjście konsoli
+
+## Ręczna obsługa (bez środowiska graficznego)
 
 ### Translacja SigmaScript do języka C
 
 ```bash
-python main.py ./programs/kod.ss
+python3 main.py ./programs/kod.ss
 ```
 
 ### Kompilacja i uruchomienie programu w C
